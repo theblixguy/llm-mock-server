@@ -28,6 +28,9 @@ export function parseLogLevel(value: string): LogLevel {
 }
 
 export async function parseHost(value: string): Promise<string> {
+  if (!value) {
+    throw new Error(`Invalid host "${value}". Must be a resolvable hostname or IP address.`);
+  }
   if (value === "localhost" || isIP(value) !== 0) {
     return value;
   }
