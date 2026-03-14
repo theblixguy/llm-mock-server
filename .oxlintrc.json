@@ -1,0 +1,35 @@
+{
+  "plugins": ["typescript", "unicorn", "oxc", "import", "promise", "node"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "warn"
+  },
+  "rules": {
+    "no-console": "off",
+    "no-unused-vars": "off",
+    "no-magic-numbers": ["warn", { "ignore": [0, 1, -1, 2, 10] }],
+    "no-await-in-loop": "off",
+    "typescript/no-unused-vars": "off",
+    "typescript/no-non-null-assertion": "off",
+    "unicorn/filename-case": "off",
+    "unicorn/no-null": "off",
+    "unicorn/prevent-abbreviations": "off",
+    "unicorn/no-array-for-each": "off",
+    "unicorn/consistent-function-scoping": "off",
+    "import/no-default-export": "off",
+    "import/no-named-export": "off",
+    "import/prefer-default-export": "off",
+    "import/group-exports": "off",
+    "oxc/no-map-spread": "off"
+  },
+  "overrides": [
+    {
+      "files": ["test/**/*.ts"],
+      "rules": {
+        "no-magic-numbers": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["dist/", "node_modules/"]
+}

@@ -1,0 +1,11 @@
+{
+  "default": true,
+  // Allow longer lines in tables and code blocks
+  "MD013": false,
+  // Allow duplicate headings in different sections
+  "MD024": { "siblings_only": true },
+  // Allow inline HTML
+  "MD033": false,
+  // Allow bare URLs
+  "MD034": false
+}
