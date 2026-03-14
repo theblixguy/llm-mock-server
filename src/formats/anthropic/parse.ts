@@ -12,11 +12,11 @@ function extractSystem(system: AnthropicRequest["system"]): Message[] {
 function extractContent(content: AnthropicRequest["messages"][number]["content"]): { content: string; toolCallId?: string | undefined } {
   if (typeof content === "string") return { content };
   const text = content
-    .filter((b) => b.type === "text")
+    .filter((b): b is { type: "text"; text: string } => b.type === "text")
     .map((b) => b.text)
     .join("\n");
-  const toolResult = content.find((b) => b.type === "tool_result");
-  const toolCallId = toolResult?.type === "tool_result" ? toolResult.tool_use_id : undefined;
+  const toolResult = content.find((b): b is { type: "tool_result"; tool_use_id: string } => b.type === "tool_result");
+  const toolCallId = toolResult?.tool_use_id;
   return { content: text, toolCallId };
 }
 
