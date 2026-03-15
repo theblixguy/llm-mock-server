@@ -40,11 +40,15 @@ describe("Loader", () => {
       await loadRulesFromPath(rulesPath, { engine });
       expect(engine.ruleCount).toBe(2);
 
-      const match1 = engine.match(makeReq({ lastMessage: "Please explain recursion" }));
+      const match1 = engine.match(
+        makeReq({ lastMessage: "Please explain recursion" }),
+      );
       if (!match1) throw new Error("expected match for 'explain'");
       expect(match1.resolve).toBe("A function that calls itself.");
 
-      const match2 = engine.match(makeReq({ model: "gpt-5.4", lastMessage: "hello" }));
+      const match2 = engine.match(
+        makeReq({ model: "gpt-5.4", lastMessage: "hello" }),
+      );
       expect(match2).toBeDefined();
     });
 
@@ -61,7 +65,9 @@ describe("Loader", () => {
       );
 
       await loadRulesFromPath(rulesPath, { engine });
-      const match = engine.match(makeReq({ lastMessage: "explain polymorphism" }));
+      const match = engine.match(
+        makeReq({ lastMessage: "explain polymorphism" }),
+      );
       expect(match).toBeDefined();
     });
 
@@ -73,7 +79,9 @@ describe("Loader", () => {
       );
 
       await loadRulesFromPath(rulesPath, { engine });
-      expect(engine.match(makeReq({ lastMessage: "hello world" }))).toBeDefined();
+      expect(
+        engine.match(makeReq({ lastMessage: "hello world" })),
+      ).toBeDefined();
     });
 
     it("loads rules with times", async () => {
@@ -123,7 +131,9 @@ describe("Loader", () => {
         }`,
       );
 
-      await expect(loadRulesFromPath(rulesPath, { engine })).rejects.toThrow("Unknown template");
+      await expect(loadRulesFromPath(rulesPath, { engine })).rejects.toThrow(
+        "Unknown template",
+      );
     });
 
     it("loads a replies sequence", async () => {
@@ -161,7 +171,9 @@ describe("Loader", () => {
       let capturedFallback: unknown;
       await loadRulesFromPath(rulesPath, {
         engine,
-        setFallback: (reply) => { capturedFallback = reply; },
+        setFallback: (reply) => {
+          capturedFallback = reply;
+        },
       });
 
       expect(capturedFallback).toBe("Default reply.");
@@ -183,7 +195,9 @@ describe("Loader", () => {
       await loadRulesFromPath(handlerPath, { engine });
       expect(engine.ruleCount).toBe(1);
 
-      const match = engine.match(makeReq({ lastMessage: "summarize this article" }));
+      const match = engine.match(
+        makeReq({ lastMessage: "summarize this article" }),
+      );
       if (!match) throw new Error("expected match for 'summarize'");
       expect(match.resolve).toBeTypeOf("function");
     });
@@ -233,9 +247,14 @@ describe("Loader", () => {
 
     it("throws on invalid handler file (missing match/respond)", async () => {
       const handlerPath = join(tmpDir, "bad.ts");
-      await writeFile(handlerPath, `export default { mach: () => true, respond: () => "hi" };`);
+      await writeFile(
+        handlerPath,
+        `export default { mach: () => true, respond: () => "hi" };`,
+      );
 
-      await expect(loadRulesFromPath(handlerPath, { engine })).rejects.toThrow("Invalid handler file");
+      await expect(loadRulesFromPath(handlerPath, { engine })).rejects.toThrow(
+        "Invalid handler file",
+      );
     });
 
     it("loads fallback from handler file", async () => {
@@ -252,7 +271,9 @@ describe("Loader", () => {
       let capturedFallback: unknown;
       await loadRulesFromPath(handlerPath, {
         engine,
-        setFallback: (reply) => { capturedFallback = reply; },
+        setFallback: (reply) => {
+          capturedFallback = reply;
+        },
       });
 
       expect(capturedFallback).toBe("Default reply.");
@@ -262,14 +283,8 @@ describe("Loader", () => {
 
   describe("directory loading", () => {
     it("loads all .json5 files from a directory", async () => {
-      await writeFile(
-        join(tmpDir, "a.json5"),
-        `[{ when: "aaa", reply: "A" }]`,
-      );
-      await writeFile(
-        join(tmpDir, "b.json5"),
-        `[{ when: "bbb", reply: "B" }]`,
-      );
+      await writeFile(join(tmpDir, "a.json5"), `[{ when: "aaa", reply: "A" }]`);
+      await writeFile(join(tmpDir, "b.json5"), `[{ when: "bbb", reply: "B" }]`);
 
       await loadRulesFromPath(tmpDir, { engine });
       expect(engine.ruleCount).toBe(2);

@@ -140,9 +140,18 @@ describe("RequestHistory", () => {
 
   describe("where()", () => {
     beforeEach(() => {
-      history.record(makeReq({ lastMessage: "hello", model: "gpt-5.4" }), "rule-a");
-      history.record(makeReq({ lastMessage: "world", model: "claude-4" }), undefined);
-      history.record(makeReq({ lastMessage: "hello again", model: "gpt-5.4" }), "rule-b");
+      history.record(
+        makeReq({ lastMessage: "hello", model: "gpt-5.4" }),
+        "rule-a",
+      );
+      history.record(
+        makeReq({ lastMessage: "world", model: "claude-4" }),
+        undefined,
+      );
+      history.record(
+        makeReq({ lastMessage: "hello again", model: "gpt-5.4" }),
+        "rule-b",
+      );
     });
 
     it("filters entries by predicate", () => {
@@ -153,13 +162,17 @@ describe("RequestHistory", () => {
     });
 
     it("filters by request properties", () => {
-      const claudeRequests = history.where((e) => e.request.model === "claude-4");
+      const claudeRequests = history.where(
+        (e) => e.request.model === "claude-4",
+      );
       expect(claudeRequests).toHaveLength(1);
       expect(claudeRequests[0].request.lastMessage).toBe("world");
     });
 
     it("returns an empty array when nothing matches", () => {
-      const none = history.where((e) => e.request.lastMessage === "nonexistent");
+      const none = history.where(
+        (e) => e.request.lastMessage === "nonexistent",
+      );
       expect(none).toEqual([]);
     });
 

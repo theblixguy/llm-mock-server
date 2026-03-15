@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-export { AnthropicRequestSchema, type AnthropicRequest } from "llm-schemas/anthropic";
+export {
+  AnthropicRequestSchema,
+  type AnthropicRequest,
+} from "llm-schemas/anthropic";
 
 const ResponseContentBlockSchema = z.object({
   type: z.string(),
@@ -28,18 +31,23 @@ export type AnthropicMessageStart = z.infer<typeof AnthropicMessageStartSchema>;
 export const AnthropicBlockEventSchema = z.object({
   index: z.number(),
   content_block: ResponseContentBlockSchema.optional(),
-  delta: z.object({
-    type: z.string(),
-    text: z.string().optional(),
-    thinking: z.string().optional(),
-    partial_json: z.string().optional(),
-  }).optional(),
+  delta: z
+    .object({
+      type: z.string(),
+      text: z.string().optional(),
+      thinking: z.string().optional(),
+      partial_json: z.string().optional(),
+    })
+    .optional(),
 });
 
 export type AnthropicBlockEvent = z.infer<typeof AnthropicBlockEventSchema>;
 
 export const AnthropicDeltaSchema = z.object({
-  delta: z.object({ stop_reason: z.string(), stop_sequence: z.string().nullable() }),
+  delta: z.object({
+    stop_reason: z.string(),
+    stop_sequence: z.string().nullable(),
+  }),
   usage: z.object({ output_tokens: z.number() }),
 });
 

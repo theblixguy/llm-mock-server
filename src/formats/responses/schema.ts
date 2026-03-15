@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-export { ResponsesRequestSchema, FunctionToolSchema, type ResponsesRequest } from "llm-schemas/openai/responses";
+export {
+  ResponsesRequestSchema,
+  FunctionToolSchema,
+  type ResponsesRequest,
+} from "llm-schemas/openai/responses";
 
 const OutputContentSchema = z.object({
   type: z.string(),
@@ -23,25 +27,31 @@ const OutputItemSchema = z.object({
 export const ResponsesEventSchema = z.object({
   type: z.string(),
   sequence_number: z.number().optional(),
-  response: z.object({
-    id: z.string(),
-    object: z.string(),
-    created_at: z.number(),
-    model: z.string(),
-    status: z.string(),
-    output: z.array(OutputItemSchema),
-    usage: z.object({
-      input_tokens: z.number(),
-      output_tokens: z.number(),
-      total_tokens: z.number(),
-    }).optional(),
-  }).optional(),
+  response: z
+    .object({
+      id: z.string(),
+      object: z.string(),
+      created_at: z.number(),
+      model: z.string(),
+      status: z.string(),
+      output: z.array(OutputItemSchema),
+      usage: z
+        .object({
+          input_tokens: z.number(),
+          output_tokens: z.number(),
+          total_tokens: z.number(),
+        })
+        .optional(),
+    })
+    .optional(),
   item: OutputItemSchema.optional(),
-  part: z.object({
-    type: z.string(),
-    text: z.string().optional(),
-    annotations: z.array(z.unknown()).optional(),
-  }).optional(),
+  part: z
+    .object({
+      type: z.string(),
+      text: z.string().optional(),
+      annotations: z.array(z.unknown()).optional(),
+    })
+    .optional(),
   delta: z.string().optional(),
   item_id: z.string().optional(),
 });
@@ -66,7 +76,11 @@ export type ResponsesComplete = z.infer<typeof ResponsesCompleteSchema>;
 
 export const ResponsesErrorSchema = z.object({
   type: z.literal("error"),
-  error: z.object({ message: z.string(), type: z.string().optional(), code: z.string().optional() }),
+  error: z.object({
+    message: z.string(),
+    type: z.string().optional(),
+    code: z.string().optional(),
+  }),
 });
 
 export type ResponsesError = z.infer<typeof ResponsesErrorSchema>;

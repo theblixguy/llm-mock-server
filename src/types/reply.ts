@@ -10,7 +10,9 @@ export interface ReplyObject {
   readonly reasoning?: string | undefined;
   readonly tools?: readonly ToolCall[] | undefined;
   /** Falls back to `{ input: 10, output: 5 }` if omitted. */
-  readonly usage?: { readonly input: number; readonly output: number } | undefined;
+  readonly usage?:
+    | { readonly input: number; readonly output: number }
+    | undefined;
   /** When set, the server responds with this HTTP error instead of a normal reply. */
   readonly error?: ErrorReply | undefined;
 }
@@ -42,4 +44,6 @@ export interface ReplyOptions {
 }
 
 /** A single entry in a reply sequence. Can be a plain reply or a reply with per-step options. */
-export type SequenceEntry = Reply | { readonly reply: Reply; readonly options?: ReplyOptions };
+export type SequenceEntry =
+  | Reply
+  | { readonly reply: Reply; readonly options?: ReplyOptions };

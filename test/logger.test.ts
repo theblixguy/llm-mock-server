@@ -260,18 +260,68 @@ describe("Logger", () => {
   });
 
   describe("each level as constructor argument", () => {
-    const cases: Array<{ level: LogLevel; expectError: boolean; expectWarn: boolean; expectInfo: boolean; expectDebug: boolean }> = [
-      { level: "none",    expectError: false, expectWarn: false, expectInfo: false, expectDebug: false },
-      { level: "error",   expectError: true,  expectWarn: false, expectInfo: false, expectDebug: false },
-      { level: "warning", expectError: true,  expectWarn: true,  expectInfo: false, expectDebug: false },
-      { level: "info",    expectError: true,  expectWarn: true,  expectInfo: true,  expectDebug: false },
-      { level: "debug",   expectError: true,  expectWarn: true,  expectInfo: true,  expectDebug: true  },
-      { level: "all",     expectError: true,  expectWarn: true,  expectInfo: true,  expectDebug: true  },
+    const cases: Array<{
+      level: LogLevel;
+      expectError: boolean;
+      expectWarn: boolean;
+      expectInfo: boolean;
+      expectDebug: boolean;
+    }> = [
+      {
+        level: "none",
+        expectError: false,
+        expectWarn: false,
+        expectInfo: false,
+        expectDebug: false,
+      },
+      {
+        level: "error",
+        expectError: true,
+        expectWarn: false,
+        expectInfo: false,
+        expectDebug: false,
+      },
+      {
+        level: "warning",
+        expectError: true,
+        expectWarn: true,
+        expectInfo: false,
+        expectDebug: false,
+      },
+      {
+        level: "info",
+        expectError: true,
+        expectWarn: true,
+        expectInfo: true,
+        expectDebug: false,
+      },
+      {
+        level: "debug",
+        expectError: true,
+        expectWarn: true,
+        expectInfo: true,
+        expectDebug: true,
+      },
+      {
+        level: "all",
+        expectError: true,
+        expectWarn: true,
+        expectInfo: true,
+        expectDebug: true,
+      },
     ];
 
-    for (const { level, expectError, expectWarn, expectInfo, expectDebug } of cases) {
+    for (const {
+      level,
+      expectError,
+      expectWarn,
+      expectInfo,
+      expectDebug,
+    } of cases) {
       it(`level '${level}' enables the correct methods`, () => {
-        const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+        const errorSpy = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
         const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
         const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 

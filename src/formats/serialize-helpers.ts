@@ -17,7 +17,11 @@ export function genId(prefix: string): string {
   return `${prefix}_${Date.now().toString(BASE_36)}`;
 }
 
-export function toolId(tool: { id?: string | undefined }, prefix: string, index: number): string {
+export function toolId(
+  tool: { id?: string | undefined },
+  prefix: string,
+  index: number,
+): string {
   return tool.id ?? `${prefix}_${Date.now().toString(BASE_36)}_${index}`;
 }
 
@@ -25,6 +29,10 @@ export function shouldEmitText(reply: ReplyObject): boolean {
   return Boolean(reply.text) || (!reply.tools?.length && !reply.reasoning);
 }
 
-export function finishReason(reply: ReplyObject, onTools: string, onStop: string): string {
+export function finishReason(
+  reply: ReplyObject,
+  onTools: string,
+  onStop: string,
+): string {
   return reply.tools?.length ? onTools : onStop;
 }

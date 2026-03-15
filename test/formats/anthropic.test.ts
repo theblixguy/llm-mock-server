@@ -1,8 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { anthropicFormat } from "../../src/formats/anthropic/index.js";
 import type {
-  AnthropicMessageStart, AnthropicBlockEvent, AnthropicDelta,
-  AnthropicComplete, AnthropicError,
+  AnthropicMessageStart,
+  AnthropicBlockEvent,
+  AnthropicDelta,
+  AnthropicComplete,
+  AnthropicError,
 } from "../../src/formats/anthropic/schema.js";
 
 function parse<T>(chunk: { data: string }): T {
@@ -40,7 +43,9 @@ describe("Anthropic Format", () => {
       const req = anthropicFormat.parseRequest({
         model: "claude-sonnet-4-6",
         max_tokens: 1024,
-        messages: [{ role: "user", content: [{ type: "text", text: "Hello there" }] }],
+        messages: [
+          { role: "user", content: [{ type: "text", text: "Hello there" }] },
+        ],
       });
       expect(req.lastMessage).toBe("Hello there");
     });
@@ -50,7 +55,13 @@ describe("Anthropic Format", () => {
         model: "claude-sonnet-4-6",
         max_tokens: 1024,
         messages: [{ role: "user", content: "read file" }],
-        tools: [{ name: "read_file", description: "Read", input_schema: { type: "object" } }],
+        tools: [
+          {
+            name: "read_file",
+            description: "Read",
+            input_schema: { type: "object" },
+          },
+        ],
       });
       expect(req.tools).toHaveLength(1);
       expect(req.tools![0]!.name).toBe("read_file");
@@ -75,7 +86,16 @@ describe("Anthropic Format", () => {
         max_tokens: 1024,
         messages: [
           { role: "user", content: "hi" },
-          { role: "user", content: [{ type: "tool_result", tool_use_id: "toolu_123", content: "result" }] },
+          {
+            role: "user",
+            content: [
+              {
+                type: "tool_result",
+                tool_use_id: "toolu_123",
+                content: "result",
+              },
+            ],
+          },
         ],
       });
       expect(req.lastToolCallId).toBe("toolu_123");
@@ -84,7 +104,10 @@ describe("Anthropic Format", () => {
 
   describe("serialize (streaming)", () => {
     it("produces correct event sequence for text", () => {
-      const chunks = anthropicFormat.serialize({ text: "Hello" }, "claude-sonnet-4-6");
+      const chunks = anthropicFormat.serialize(
+        { text: "Hello" },
+        "claude-sonnet-4-6",
+      );
       const events = chunks.map((c) => c.event);
       expect(events).toEqual([
         "message_start",
@@ -97,7 +120,10 @@ describe("Anthropic Format", () => {
     });
 
     it("message_start contains correct structure", () => {
-      const chunks = anthropicFormat.serialize({ text: "Hello" }, "claude-sonnet-4-6");
+      const chunks = anthropicFormat.serialize(
+        { text: "Hello" },
+        "claude-sonnet-4-6",
+      );
       const msg = parse<AnthropicMessageStart>(chunks[0]!);
       expect(msg.message).toMatchObject({
         type: "message",
@@ -111,7 +137,10 @@ describe("Anthropic Format", () => {
     });
 
     it("text block uses index 0 when no reasoning", () => {
-      const chunks = anthropicFormat.serialize({ text: "Hello" }, "claude-sonnet-4-6");
+      const chunks = anthropicFormat.serialize(
+        { text: "Hello" },
+        "claude-sonnet-4-6",
+      );
       const blockStart = chunks.find((c) => c.event === "content_block_start");
       const data = parse<AnthropicBlockEvent>(blockStart!);
       expect(data.index).toBe(0);
@@ -143,7 +172,9 @@ describe("Anthropic Format", () => {
         return parse<AnthropicBlockEvent>(c).delta?.type === "thinking_delta";
       });
       expect(thinkingDelta).toBeDefined();
-      expect(parse<AnthropicBlockEvent>(thinkingDelta!).delta?.thinking).toBe("Let me think");
+      expect(parse<AnthropicBlockEvent>(thinkingDelta!).delta?.thinking).toBe(
+        "Let me think",
+      );
     });
 
     it("closes thinking block before text block starts", () => {
@@ -151,9 +182,18 @@ describe("Anthropic Format", () => {
         { text: "answer", reasoning: "think" },
         "claude-sonnet-4-6",
       );
-      const events = chunks.map((c) => ({ event: c.event, data: parse<AnthropicBlockEvent>(c) }));
-      const thinkingStop = events.findIndex((e) => e.event === "content_block_stop" && e.data.index === 0);
-      const textStart = events.findIndex((e) => e.event === "content_block_start" && e.data.content_block?.type === "text");
+      const events = chunks.map((c) => ({
+        event: c.event,
+        data: parse<AnthropicBlockEvent>(c),
+      }));
+      const thinkingStop = events.findIndex(
+        (e) => e.event === "content_block_stop" && e.data.index === 0,
+      );
+      const textStart = events.findIndex(
+        (e) =>
+          e.event === "content_block_start" &&
+          e.data.content_block?.type === "text",
+      );
       expect(thinkingStop).toBeLessThan(textStart);
     });
 
@@ -179,17 +219,25 @@ describe("Anthropic Format", () => {
         "claude-sonnet-4-6",
       );
       const delta = chunks.find((c) => c.event === "message_delta");
-      expect(parse<AnthropicDelta>(delta!).delta).toMatchObject({ stop_reason: "tool_use" });
+      expect(parse<AnthropicDelta>(delta!).delta).toMatchObject({
+        stop_reason: "tool_use",
+      });
     });
 
     it("includes stop_sequence: null in message_delta", () => {
-      const chunks = anthropicFormat.serialize({ text: "Hello" }, "claude-sonnet-4-6");
+      const chunks = anthropicFormat.serialize(
+        { text: "Hello" },
+        "claude-sonnet-4-6",
+      );
       const delta = chunks.find((c) => c.event === "message_delta");
       expect(parse<AnthropicDelta>(delta!).delta.stop_sequence).toBeNull();
     });
 
     it("message_delta includes output_tokens in usage", () => {
-      const chunks = anthropicFormat.serialize({ text: "Hello", usage: { input: 20, output: 15 } }, "claude-sonnet-4-6");
+      const chunks = anthropicFormat.serialize(
+        { text: "Hello", usage: { input: 20, output: 15 } },
+        "claude-sonnet-4-6",
+      );
       const delta = chunks.find((c) => c.event === "message_delta");
       expect(parse<AnthropicDelta>(delta!).usage.output_tokens).toBe(15);
     });
@@ -197,7 +245,10 @@ describe("Anthropic Format", () => {
 
   describe("serializeComplete (non-streaming)", () => {
     it("produces correct top-level structure", () => {
-      const result = anthropicFormat.serializeComplete({ text: "Hello" }, "claude-sonnet-4-6") as AnthropicComplete;
+      const result = anthropicFormat.serializeComplete(
+        { text: "Hello" },
+        "claude-sonnet-4-6",
+      ) as AnthropicComplete;
       expect(result.type).toBe("message");
       expect(result.role).toBe("assistant");
       expect(result.model).toBe("claude-sonnet-4-6");
@@ -206,8 +257,14 @@ describe("Anthropic Format", () => {
     });
 
     it("includes text content block", () => {
-      const result = anthropicFormat.serializeComplete({ text: "Hello, world!" }, "claude-sonnet-4-6") as AnthropicComplete;
-      expect(result.content[0]).toMatchObject({ type: "text", text: "Hello, world!" });
+      const result = anthropicFormat.serializeComplete(
+        { text: "Hello, world!" },
+        "claude-sonnet-4-6",
+      ) as AnthropicComplete;
+      expect(result.content[0]).toMatchObject({
+        type: "text",
+        text: "Hello, world!",
+      });
     });
 
     it("includes thinking before text when reasoning provided", () => {
@@ -251,7 +308,11 @@ describe("Anthropic Format", () => {
 
   describe("serializeError", () => {
     it("produces Anthropic error format", () => {
-      const result = anthropicFormat.serializeError({ status: 400, message: "Bad request", type: "invalid_request_error" }) as AnthropicError;
+      const result = anthropicFormat.serializeError({
+        status: 400,
+        message: "Bad request",
+        type: "invalid_request_error",
+      }) as AnthropicError;
       expect(result.type).toBe("error");
       expect(result.error.type).toBe("invalid_request_error");
       expect(result.error.message).toBe("Bad request");

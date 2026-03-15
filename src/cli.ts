@@ -6,7 +6,13 @@ import { Command } from "commander";
 import pc from "picocolors";
 import { MockServer } from "./mock-server.js";
 import { Logger } from "./logger.js";
-import { parsePort, parseHost, parseLogLevel, parseChunkSize, parseLatency } from "./cli-validators.js";
+import {
+  parsePort,
+  parseHost,
+  parseLogLevel,
+  parseChunkSize,
+  parseLatency,
+} from "./cli-validators.js";
 
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
@@ -58,12 +64,18 @@ async function start(options: StartOptions): Promise<void> {
 
   if (!quiet) {
     console.log();
-    console.log(`  ${pc.bold(pc.cyan("llm-mock-server"))} ${pc.dim(`v${version}`)}`);
+    console.log(
+      `  ${pc.bold(pc.cyan("llm-mock-server"))} ${pc.dim(`v${version}`)}`,
+    );
     console.log();
     console.log(`  ${pc.dim("Port")}       ${pc.bold(String(port))}`);
-    console.log(`  ${pc.dim("Rules")}      ${pc.bold(String(server.ruleCount))} loaded`);
+    console.log(
+      `  ${pc.dim("Rules")}      ${pc.bold(String(server.ruleCount))} loaded`,
+    );
     if (latency > 0) {
-      console.log(`  ${pc.dim("Latency")}    ${pc.bold(`${String(latency)}ms`)} per chunk`);
+      console.log(
+        `  ${pc.dim("Latency")}    ${pc.bold(`${String(latency)}ms`)} per chunk`,
+      );
     }
     console.log(
       `  ${pc.dim("Endpoints")}  ${pc.green("/v1/chat/completions")}, ${pc.green("/v1/messages")}, ${pc.green("/v1/responses")}`,
@@ -103,8 +115,12 @@ async function start(options: StartOptions): Promise<void> {
     process.exit(0);
   };
 
-  process.on("SIGINT", () => { shutdown("SIGINT").catch(() => process.exit(1)); });
-  process.on("SIGTERM", () => { shutdown("SIGTERM").catch(() => process.exit(1)); });
+  process.on("SIGINT", () => {
+    shutdown("SIGINT").catch(() => process.exit(1));
+  });
+  process.on("SIGTERM", () => {
+    shutdown("SIGTERM").catch(() => process.exit(1));
+  });
 }
 
 const program = new Command()

@@ -25,7 +25,11 @@ const json5ReplySchema = z.union([
   z.object({
     text: z.string().optional(),
     reasoning: z.string().optional(),
-    tools: z.array(z.object({ name: z.string(), args: z.record(z.string(), z.unknown()) })).optional(),
+    tools: z
+      .array(
+        z.object({ name: z.string(), args: z.record(z.string(), z.unknown()) }),
+      )
+      .optional(),
   }),
 ]);
 
@@ -77,7 +81,9 @@ function compileMatch(when: z.infer<typeof json5MatchSchema>): Match {
     return parseRegexString(when);
   }
   const obj: MatchObject = {
-    ...(when.message !== undefined && { message: parseRegexString(when.message) }),
+    ...(when.message !== undefined && {
+      message: parseRegexString(when.message),
+    }),
     ...(when.model !== undefined && { model: parseRegexString(when.model) }),
     ...(when.system !== undefined && { system: parseRegexString(when.system) }),
     ...(when.format !== undefined && { format: when.format }),
@@ -124,14 +130,21 @@ function addSequenceRule(
   rule.remaining = entryCount;
 }
 
-async function loadJson5File(filePath: string, ctx: LoadContext): Promise<void> {
+async function loadJson5File(
+  filePath: string,
+  ctx: LoadContext,
+): Promise<void> {
   const content = await readFile(filePath, "utf-8");
   const parsed = json5FileSchema.parse(JSON5.parse(content));
 
   const rules = Array.isArray(parsed) ? parsed : parsed.rules;
   const templates = Array.isArray(parsed) ? undefined : parsed.templates;
 
-  if (!Array.isArray(parsed) && parsed.fallback !== undefined && ctx.setFallback) {
+  if (
+    !Array.isArray(parsed) &&
+    parsed.fallback !== undefined &&
+    ctx.setFallback
+  ) {
     ctx.setFallback(parsed.fallback);
   }
 
@@ -152,7 +165,9 @@ async function loadJson5File(filePath: string, ctx: LoadContext): Promise<void> 
 const handlerSchema = z.custom<Handler>((val): val is Handler => {
   if (typeof val !== "object" || val === null) return false;
   const obj = val as Record<string, unknown>;
-  return typeof obj["match"] === "function" && typeof obj["respond"] === "function";
+  return (
+    typeof obj["match"] === "function" && typeof obj["respond"] === "function"
+  );
 });
 
 const handlerExportSchema = z.object({
@@ -160,7 +175,10 @@ const handlerExportSchema = z.object({
   fallback: json5ReplySchema.optional(),
 });
 
-async function loadHandlerFile(filePath: string, ctx: LoadContext): Promise<void> {
+async function loadHandlerFile(
+  filePath: string,
+  ctx: LoadContext,
+): Promise<void> {
   const mod = await import(filePath);
   const parsed = handlerExportSchema.safeParse(mod);
   if (!parsed.success) {
@@ -168,14 +186,20 @@ async function loadHandlerFile(filePath: string, ctx: LoadContext): Promise<void
       `Invalid handler file ${filePath}. Expected default export with { match: Function, respond: Function }.`,
     );
   }
-  const handlers = Array.isArray(parsed.data.default) ? parsed.data.default : [parsed.data.default];
+  const handlers = Array.isArray(parsed.data.default)
+    ? parsed.data.default
+    : [parsed.data.default];
 
   if (parsed.data.fallback !== undefined && ctx.setFallback) {
     ctx.setFallback(parsed.data.fallback);
   }
 
   for (const handler of handlers) {
-    ctx.engine.addHandler(handler.match, handler.respond, `(handler: ${filePath})`);
+    ctx.engine.addHandler(
+      handler.match,
+      handler.respond,
+      `(handler: ${filePath})`,
+    );
   }
 }
 
@@ -189,7 +213,10 @@ const loaderByExtension: ReadonlyMap<string, FileLoader> = new Map([
   [".mjs", loadHandlerFile],
 ]);
 
-export async function loadRulesFromPath(pathOrDir: string, ctx: LoadContext): Promise<void> {
+export async function loadRulesFromPath(
+  pathOrDir: string,
+  ctx: LoadContext,
+): Promise<void> {
   const info = await stat(pathOrDir);
 
   if (info.isFile()) {

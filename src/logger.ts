@@ -21,7 +21,10 @@ const LEVEL_STYLE = {
 
 type ConsoleMethod = "error" | "warn" | "log";
 
-const LEVEL_CONFIG: Record<keyof typeof LEVEL_STYLE, { priority: number; method: ConsoleMethod; dim?: boolean }> = {
+const LEVEL_CONFIG: Record<
+  keyof typeof LEVEL_STYLE,
+  { priority: number; method: ConsoleMethod; dim?: boolean }
+> = {
   error: { priority: LEVEL_PRIORITY.error, method: "error" },
   warn: { priority: LEVEL_PRIORITY.warning, method: "warn" },
   info: { priority: LEVEL_PRIORITY.info, method: "log" },
@@ -37,16 +40,31 @@ export class Logger {
     this.threshold = LEVEL_PRIORITY[level];
   }
 
-  private log(key: keyof typeof LEVEL_STYLE, msg: string, args: unknown[]): void {
+  private log(
+    key: keyof typeof LEVEL_STYLE,
+    msg: string,
+    args: unknown[],
+  ): void {
     const config = LEVEL_CONFIG[key];
     if (this.threshold < config.priority) return;
     const { label, symbol } = LEVEL_STYLE[key];
     const text = config.dim ? pc.dim(msg) : msg;
-    console[config.method](`${pc.dim(new Date().toISOString())} ${symbol} ${label} ${text}`, ...args);
+    console[config.method](
+      `${pc.dim(new Date().toISOString())} ${symbol} ${label} ${text}`,
+      ...args,
+    );
   }
 
-  error(msg: string, ...args: unknown[]): void { this.log("error", msg, args); }
-  warn(msg: string, ...args: unknown[]): void { this.log("warn", msg, args); }
-  info(msg: string, ...args: unknown[]): void { this.log("info", msg, args); }
-  debug(msg: string, ...args: unknown[]): void { this.log("debug", msg, args); }
+  error(msg: string, ...args: unknown[]): void {
+    this.log("error", msg, args);
+  }
+  warn(msg: string, ...args: unknown[]): void {
+    this.log("warn", msg, args);
+  }
+  info(msg: string, ...args: unknown[]): void {
+    this.log("info", msg, args);
+  }
+  debug(msg: string, ...args: unknown[]): void {
+    this.log("debug", msg, args);
+  }
 }

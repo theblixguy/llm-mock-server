@@ -1,4 +1,9 @@
-import type { FormatName, MockRequest, ReplyObject, ReplyOptions } from "../types.js";
+import type {
+  FormatName,
+  MockRequest,
+  ReplyObject,
+  ReplyOptions,
+} from "../types.js";
 import type { RequestMeta } from "./request-helpers.js";
 
 export interface SSEChunk {
@@ -11,7 +16,15 @@ export interface Format {
   readonly route: string;
   parseRequest(body: unknown, meta?: RequestMeta): MockRequest;
   isStreaming(body: unknown): boolean;
-  serialize(reply: ReplyObject, model: string, options?: ReplyOptions): readonly SSEChunk[];
+  serialize(
+    reply: ReplyObject,
+    model: string,
+    options?: ReplyOptions,
+  ): readonly SSEChunk[];
   serializeComplete(reply: ReplyObject, model: string): Record<string, unknown>;
-  serializeError(error: { status: number; message: string; type?: string | undefined }): Record<string, unknown>;
+  serializeError(error: {
+    status: number;
+    message: string;
+    type?: string | undefined;
+  }): Record<string, unknown>;
 }

@@ -18,7 +18,9 @@ describe("RuleEngine", () => {
 
   it("matches a regex", () => {
     engine.add(/explain (\w+)/i, "Here is an explanation.");
-    const rule = engine.match(makeReq({ lastMessage: "Can you explain recursion?" }));
+    const rule = engine.match(
+      makeReq({ lastMessage: "Can you explain recursion?" }),
+    );
     expect(rule).toBeDefined();
   });
 
@@ -44,15 +46,25 @@ describe("RuleEngine", () => {
 
   it("matches a MatchObject with message + model", () => {
     engine.add({ model: "gpt-5.4", message: "hello" }, "Hi from GPT-5.4");
-    expect(engine.match(makeReq({ model: "gpt-5.4", lastMessage: "hello" }))).toBeDefined();
-    expect(engine.match(makeReq({ model: "gpt-5.4", lastMessage: "bye" }))).toBeUndefined();
-    expect(engine.match(makeReq({ model: "claude", lastMessage: "hello" }))).toBeUndefined();
+    expect(
+      engine.match(makeReq({ model: "gpt-5.4", lastMessage: "hello" })),
+    ).toBeDefined();
+    expect(
+      engine.match(makeReq({ model: "gpt-5.4", lastMessage: "bye" })),
+    ).toBeUndefined();
+    expect(
+      engine.match(makeReq({ model: "claude", lastMessage: "hello" })),
+    ).toBeUndefined();
   });
 
   it("matches a MatchObject with system", () => {
     engine.add({ system: /pirate/i }, "Arrr!");
-    expect(engine.match(makeReq({ systemMessage: "You are a pirate" }))).toBeDefined();
-    expect(engine.match(makeReq({ systemMessage: "You are helpful" }))).toBeUndefined();
+    expect(
+      engine.match(makeReq({ systemMessage: "You are a pirate" })),
+    ).toBeDefined();
+    expect(
+      engine.match(makeReq({ systemMessage: "You are helpful" })),
+    ).toBeUndefined();
   });
 
   it("matches a MatchObject with format", () => {
@@ -115,13 +127,17 @@ describe("RuleEngine", () => {
       (req) => req.lastMessage.includes("test"),
       "Handler reply",
     );
-    expect(engine.match(makeReq({ lastMessage: "this is a test" }))).toBeDefined();
+    expect(
+      engine.match(makeReq({ lastMessage: "this is a test" })),
+    ).toBeDefined();
   });
 
   describe("toolName matching", () => {
     it("matches when toolNames includes the specified tool", () => {
       engine.add({ toolName: "get_weather" }, "Weather tool present");
-      expect(engine.match(makeReq({ toolNames: ["get_weather", "search"] }))).toBeDefined();
+      expect(
+        engine.match(makeReq({ toolNames: ["get_weather", "search"] })),
+      ).toBeDefined();
       expect(engine.match(makeReq({ toolNames: ["search"] }))).toBeUndefined();
     });
   });
@@ -129,8 +145,12 @@ describe("RuleEngine", () => {
   describe("toolCallId matching", () => {
     it("matches when lastToolCallId equals the specified id", () => {
       engine.add({ toolCallId: "call_abc" }, "Tool result");
-      expect(engine.match(makeReq({ lastToolCallId: "call_abc" }))).toBeDefined();
-      expect(engine.match(makeReq({ lastToolCallId: "call_xyz" }))).toBeUndefined();
+      expect(
+        engine.match(makeReq({ lastToolCallId: "call_abc" })),
+      ).toBeDefined();
+      expect(
+        engine.match(makeReq({ lastToolCallId: "call_xyz" })),
+      ).toBeUndefined();
       expect(engine.match(makeReq())).toBeUndefined();
     });
   });
@@ -154,20 +174,30 @@ describe("RuleEngine", () => {
       );
       expect(engine.match(makeReq({ model: "gpt-5.4" }))).toBeUndefined();
 
-      expect(engine.match(makeReq({
-        model: "gpt-5.4",
-        messages: [
-          { role: "system", content: "sys" },
-          { role: "user", content: "a" },
-          { role: "assistant", content: "b" },
-        ],
-      }))).toBeDefined();
+      expect(
+        engine.match(
+          makeReq({
+            model: "gpt-5.4",
+            messages: [
+              { role: "system", content: "sys" },
+              { role: "user", content: "a" },
+              { role: "assistant", content: "b" },
+            ],
+          }),
+        ),
+      ).toBeDefined();
     });
 
     it("predicate runs after other fields (short-circuits)", () => {
       let called = false;
       engine.add(
-        { model: "claude", predicate: () => { called = true; return true; } },
+        {
+          model: "claude",
+          predicate: () => {
+            called = true;
+            return true;
+          },
+        },
         "Never reached",
       );
       engine.match(makeReq({ model: "gpt-5.4" }));

@@ -1,7 +1,18 @@
-import type { Match, MatchObject, MockRequest, Resolver, Reply, ReplyOptions, Rule, RuleSummary } from "./types.js";
+import type {
+  Match,
+  MatchObject,
+  MockRequest,
+  Resolver,
+  Reply,
+  ReplyOptions,
+  Rule,
+  RuleSummary,
+} from "./types.js";
 
 function safeRegex(re: RegExp): RegExp {
-  return (re.global || re.sticky) ? new RegExp(re.source, re.flags.replace(/[gy]/g, "")) : re;
+  return re.global || re.sticky
+    ? new RegExp(re.source, re.flags.replace(/[gy]/g, ""))
+    : re;
 }
 
 function compilePattern(pattern: string | RegExp): (value: string) => boolean {
@@ -26,16 +37,21 @@ function compileMatcher(match: Match): (req: MockRequest) => boolean {
     return match;
   }
   const obj = match;
-  const messageTest = obj.message !== undefined ? compilePattern(obj.message) : undefined;
-  const modelTest = obj.model !== undefined ? compilePattern(obj.model) : undefined;
-  const systemTest = obj.system !== undefined ? compilePattern(obj.system) : undefined;
+  const messageTest =
+    obj.message !== undefined ? compilePattern(obj.message) : undefined;
+  const modelTest =
+    obj.model !== undefined ? compilePattern(obj.model) : undefined;
+  const systemTest =
+    obj.system !== undefined ? compilePattern(obj.system) : undefined;
   return (req) => {
     if (messageTest && !messageTest(req.lastMessage)) return false;
     if (modelTest && !modelTest(req.model)) return false;
     if (systemTest && !systemTest(req.systemMessage)) return false;
     if (obj.format !== undefined && req.format !== obj.format) return false;
-    if (obj.toolName !== undefined && !req.toolNames.includes(obj.toolName)) return false;
-    if (obj.toolCallId !== undefined && req.lastToolCallId !== obj.toolCallId) return false;
+    if (obj.toolName !== undefined && !req.toolNames.includes(obj.toolName))
+      return false;
+    if (obj.toolCallId !== undefined && req.lastToolCallId !== obj.toolCallId)
+      return false;
     if (obj.predicate && !obj.predicate(req)) return false;
     return true;
   };
@@ -52,7 +68,12 @@ function describeMatch(match: Match): string {
   return `{${parts.join(", ")}}`;
 }
 
-function createRule(match: Match, resolve: Resolver, options: ReplyOptions, description?: string): Rule {
+function createRule(
+  match: Match,
+  resolve: Resolver,
+  options: ReplyOptions,
+  description?: string,
+): Rule {
   return {
     description: description ?? describeMatch(match),
     match: compileMatcher(match),
@@ -71,7 +92,8 @@ export function createSequenceResolver(
   steps: readonly SequenceStep[],
   rule: { options: ReplyOptions },
 ): { resolver: () => Reply; entryCount: number } {
-  if (steps.length === 0) throw new Error("Sequence requires at least one entry.");
+  if (steps.length === 0)
+    throw new Error("Sequence requires at least one entry.");
   let index = 0;
   const last = steps[steps.length - 1]!;
   return {
@@ -101,7 +123,11 @@ export class RuleEngine {
     }
   }
 
-  addHandler(matchFn: (req: MockRequest) => boolean, respond: Resolver, description = "(handler)"): Rule {
+  addHandler(
+    matchFn: (req: MockRequest) => boolean,
+    respond: Resolver,
+    description = "(handler)",
+  ): Rule {
     const rule = createRule(matchFn, respond, {}, description);
     this.rules.push(rule);
     return rule;
@@ -124,7 +150,9 @@ export class RuleEngine {
   }
 
   isDone(): boolean {
-    return this.rules.every((r) => !Number.isFinite(r.remaining) || r.remaining <= 0);
+    return this.rules.every(
+      (r) => !Number.isFinite(r.remaining) || r.remaining <= 0,
+    );
   }
 
   get ruleCount(): number {
@@ -132,7 +160,10 @@ export class RuleEngine {
   }
 
   describe(): readonly RuleSummary[] {
-    return this.rules.map((r) => ({ description: r.description, remaining: r.remaining }));
+    return this.rules.map((r) => ({
+      description: r.description,
+      remaining: r.remaining,
+    }));
   }
 
   clear(): void {
