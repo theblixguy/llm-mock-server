@@ -288,8 +288,8 @@ export function serializeComplete(
           },
         ]
       : []),
-    ...(reply.tools ?? []).map((tool) => {
-      const callId = toolId(tool, "call", 0);
+    ...(reply.tools ?? []).map((tool, i) => {
+      const callId = toolId(tool, "call", i);
       return {
         type: "function_call",
         id: callId,

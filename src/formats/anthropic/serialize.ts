@@ -147,9 +147,9 @@ export function serializeComplete(
     ...(shouldEmitText(reply)
       ? [{ type: "text", text: reply.text ?? "" }]
       : []),
-    ...(reply.tools ?? []).map((tool) => ({
+    ...(reply.tools ?? []).map((tool, i) => ({
       type: "tool_use",
-      id: toolId(tool, "toolu", 0),
+      id: toolId(tool, "toolu", i),
       name: tool.name,
       input: tool.args,
     })),

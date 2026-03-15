@@ -289,6 +289,21 @@ describe("Anthropic Format", () => {
       expect(tool.id).toBeTypeOf("string");
     });
 
+    it("generates unique IDs for multiple tools", () => {
+      const result = anthropicFormat.serializeComplete(
+        {
+          tools: [
+            { name: "read_file", args: { path: "/a" } },
+            { name: "write_file", args: { path: "/b" } },
+          ],
+        },
+        "claude-sonnet-4-6",
+      ) as AnthropicComplete;
+      const tools = result.content.filter((c) => c.type === "tool_use");
+      if (tools.length !== 2) throw new Error("expected 2 tool_use blocks");
+      expect(tools[0].id).not.toBe(tools[1].id);
+    });
+
     it("sets stop_reason to tool_use when tools present", () => {
       const result = anthropicFormat.serializeComplete(
         { tools: [{ name: "read_file", args: {} }] },

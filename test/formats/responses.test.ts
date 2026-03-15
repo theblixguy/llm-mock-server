@@ -339,6 +339,22 @@ describe("Responses Format", () => {
       expect(fnCall.call_id).toBeTypeOf("string");
     });
 
+    it("generates unique IDs for multiple tools", () => {
+      const result = responsesFormat.serializeComplete(
+        {
+          tools: [
+            { name: "read_file", args: { path: "/a" } },
+            { name: "write_file", args: { path: "/b" } },
+          ],
+        },
+        "codex-mini",
+      ) as ResponsesComplete;
+      const calls = result.output.filter((o) => o.type === "function_call");
+      if (calls.length !== 2)
+        throw new Error("expected 2 function_call outputs");
+      expect(calls[0].call_id).not.toBe(calls[1].call_id);
+    });
+
     it("includes usage tokens", () => {
       const result = responsesFormat.serializeComplete(
         { text: "hi", usage: { input: 20, output: 15 } },
