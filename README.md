@@ -24,6 +24,7 @@ A mock LLM server for testing. It handles OpenAI `/chat/completions`, Anthropic 
 - [Logging](#logging)
 - [CLI](#cli)
 - [Security](#security)
+- [Architecture](#architecture)
 - [Licence](#licence)
 
 ## Quick start
@@ -422,6 +423,10 @@ The server binds to `127.0.0.1` by default, so it's only reachable from your mac
 ### Request limits
 
 Request bodies are capped at 1 MB by Fastify's default. Responses are serialised through JSON, so there's no injection risk in the SSE output.
+
+## Architecture
+
+See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the codebase is structured, the request lifecycle, rule matching, and response serialisation.
 
 ## Licence
 
