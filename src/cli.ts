@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 
 import { watch } from "node:fs";
+import { createRequire } from "node:module";
 import { Command } from "commander";
 import pc from "picocolors";
 import { MockServer } from "./mock-server.js";
 import { Logger } from "./logger.js";
 import { parsePort, parseHost, parseLogLevel, parseChunkSize, parseLatency } from "./cli-validators.js";
+
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json") as { version: string };
 
 const WATCH_DEBOUNCE_MS = 100;
 
@@ -54,7 +58,7 @@ async function start(options: StartOptions): Promise<void> {
 
   if (!quiet) {
     console.log();
-    console.log(`  ${pc.bold(pc.cyan("llm-mock-server"))} ${pc.dim("v1.0.0")}`);
+    console.log(`  ${pc.bold(pc.cyan("llm-mock-server"))} ${pc.dim(`v${version}`)}`);
     console.log();
     console.log(`  ${pc.dim("Port")}       ${pc.bold(String(port))}`);
     console.log(`  ${pc.dim("Rules")}      ${pc.bold(String(server.ruleCount))} loaded`);
@@ -106,7 +110,7 @@ async function start(options: StartOptions): Promise<void> {
 const program = new Command()
   .name("llm-mock-server")
   .description("Mock LLM server for deterministic testing")
-  .version("1.0.0");
+  .version(version);
 
 program
   .command("start", { isDefault: true })

@@ -17,13 +17,9 @@ export type Match =
 
 /** A structured matcher. Every field you set must match for the rule to fire. */
 export interface MatchObject {
-  /** Substring or regex against the last user message. */
   readonly message?: string | RegExp;
-  /** Substring or regex against the model name. */
   readonly model?: string | RegExp;
-  /** Substring or regex against the system prompt. */
   readonly system?: string | RegExp;
-  /** Only match requests from this API format. */
   readonly format?: FormatName;
   /** Match when the request includes a tool definition with this name. */
   readonly toolName?: string;
@@ -36,15 +32,13 @@ export interface MatchObject {
 /** Returned by `when()`. Call `.reply()` or `.replySequence()` on it to complete the rule. */
 export interface PendingRule {
   reply(response: Resolver, options?: ReplyOptions): RuleHandle;
-  /** Each match advances through the array. The last entry repeats once the sequence is exhausted. */
+  /** Each match advances through the array. The last entry repeats once exhausted. */
   replySequence(entries: readonly SequenceEntry[]): RuleHandle;
 }
 
 /** A handle to a registered rule. All methods return `this` for chaining. */
 export interface RuleHandle {
-  /** Auto-expire the rule after `n` matches. */
   times(n: number): RuleHandle;
-  /** Move this rule to the front of the list so it matches first. */
   first(): RuleHandle;
 }
 
@@ -59,16 +53,15 @@ export interface Handler {
 
 /** A summary of a registered rule, for inspection. */
 export interface RuleSummary {
-  /** Human-readable description of what the rule matches. */
   readonly description: string;
-  /** How many matches are left. `Infinity` means unlimited. */
+  /** `Infinity` means unlimited. */
   readonly remaining: number;
 }
 
 export interface Rule {
   readonly description: string;
   readonly match: (req: MockRequest) => boolean;
-  readonly resolve: Resolver;
+  resolve: Resolver;
   options: ReplyOptions;
   remaining: number;
 }

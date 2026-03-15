@@ -1,5 +1,5 @@
 import type { Format } from "../types.js";
-import { isStreaming } from "../parse-helpers.js";
+import { isStreaming } from "../request-helpers.js";
 import { parseRequest } from "./parse.js";
 import { serialize, serializeComplete, serializeError } from "./serialize.js";
 

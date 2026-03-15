@@ -1,5 +1,5 @@
 import type { MockRequest, Message, ToolDef } from "../../types.js";
-import { buildMockRequest, type RequestMeta } from "../parse-helpers.js";
+import { buildMockRequest, type RequestMeta } from "../request-helpers.js";
 import { OpenAIRequestSchema, type OpenAIRequest } from "./schema.js";
 
 function extractContent(content: OpenAIRequest["messages"][number]["content"]): string {
