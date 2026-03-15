@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export { ResponsesRequestSchema, FunctionToolSchema, type FunctionTool, type ResponsesRequest } from "llm-schemas/openai/responses";
+export { ResponsesRequestSchema, FunctionToolSchema, type ResponsesRequest } from "llm-schemas/openai/responses";
 
 const OutputContentSchema = z.object({
   type: z.string(),
@@ -19,8 +19,6 @@ const OutputItemSchema = z.object({
   arguments: z.string().optional(),
   summary: z.array(z.object({ type: z.string(), text: z.string() })).optional(),
 });
-
-export type ResponsesOutputItem = z.infer<typeof OutputItemSchema>;
 
 export const ResponsesEventSchema = z.object({
   type: z.string(),
