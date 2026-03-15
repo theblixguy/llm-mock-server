@@ -85,11 +85,10 @@ async function start(options: StartOptions): Promise<void> {
 
   if (options.watch && options.rules) {
     const rulesPath = options.rules;
-    let reloading = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     watch(rulesPath, { recursive: true }, () => {
-      if (reloading) return;
-      reloading = true;
-      setTimeout(async () => {
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
         try {
           server.reset();
           await server.load(rulesPath);
@@ -98,7 +97,6 @@ async function start(options: StartOptions): Promise<void> {
         } catch (err) {
           logger.error("Failed to reload rules", err);
         }
-        reloading = false;
       }, WATCH_DEBOUNCE_MS);
     });
     logger.info(`Watching ${rulesPath} for changes`);

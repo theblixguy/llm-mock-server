@@ -281,6 +281,26 @@ describe("Loader", () => {
     });
   });
 
+  describe("unsupported file extension", () => {
+    it("throws when loading a file with unsupported extension", async () => {
+      const yamlPath = join(tmpDir, "rules.yaml");
+      await writeFile(yamlPath, "- when: hello\n  reply: Hi!");
+      await expect(loadRulesFromPath(yamlPath, { engine })).rejects.toThrow(
+        'Unsupported file extension ".yaml"',
+      );
+    });
+
+    it("skips unsupported files when scanning a directory", async () => {
+      await writeFile(
+        join(tmpDir, "good.json5"),
+        `[{ when: "hello", reply: "Hi!" }]`,
+      );
+      await writeFile(join(tmpDir, "notes.txt"), "not a rule file");
+      await loadRulesFromPath(tmpDir, { engine });
+      expect(engine.ruleCount).toBe(1);
+    });
+  });
+
   describe("directory loading", () => {
     it("loads all .json5 files from a directory", async () => {
       await writeFile(join(tmpDir, "a.json5"), `[{ when: "aaa", reply: "A" }]`);

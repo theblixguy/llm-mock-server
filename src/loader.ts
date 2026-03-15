@@ -220,8 +220,12 @@ export async function loadRulesFromPath(
   const info = await stat(pathOrDir);
 
   if (info.isFile()) {
-    const loader = loaderByExtension.get(extname(pathOrDir));
-    if (loader) await loader(pathOrDir, ctx);
+    const ext = extname(pathOrDir);
+    const loader = loaderByExtension.get(ext);
+    if (!loader) {
+      throw new Error(`Unsupported file extension "${ext}" for ${pathOrDir}`);
+    }
+    await loader(pathOrDir, ctx);
     return;
   }
 
@@ -231,6 +235,11 @@ export async function loadRulesFromPath(
   for (const entry of entries) {
     const fullPath = join(pathOrDir, entry);
     const entryStat = await stat(fullPath);
-    if (entryStat.isFile()) await loadRulesFromPath(fullPath, ctx);
+    if (entryStat.isDirectory()) {
+      await loadRulesFromPath(fullPath, ctx);
+    } else if (entryStat.isFile()) {
+      const loader = loaderByExtension.get(extname(fullPath));
+      if (loader) await loader(fullPath, ctx);
+    }
   }
 }
