@@ -1,5 +1,5 @@
 import type { MockRequest, Message, ToolDef } from "../../types.js";
-import { buildMockRequest, type RequestMeta } from "../parse-helpers.js";
+import { buildMockRequest, type RequestMeta } from "../request-helpers.js";
 import { AnthropicRequestSchema, type AnthropicRequest } from "./schema.js";
 
 function extractSystem(system: AnthropicRequest["system"]): Message[] {

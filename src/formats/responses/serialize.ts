@@ -1,6 +1,10 @@
 import type { ReplyObject, ReplyOptions, ToolCall } from "../../types.js";
 import type { SSEChunk } from "../types.js";
-import { splitText, genId, toolId, shouldEmitText, MS_PER_SECOND, DEFAULT_USAGE } from "../parse-helpers.js";
+import { splitText, genId, toolId, shouldEmitText, MS_PER_SECOND, DEFAULT_USAGE } from "../serialize-helpers.js";
+
+function buildUsage(usage: { input: number; output: number }) {
+  return { input_tokens: usage.input, output_tokens: usage.output, total_tokens: usage.input + usage.output };
+}
 
 interface StreamBlock { chunks: SSEChunk[]; outputItem: unknown }
 
@@ -95,12 +99,12 @@ export function serialize(reply: ReplyObject, model: string, options: ReplyOptio
     c({
       type: "response.completed",
       response: { ...baseResponse, status: "completed", output,
-        usage: { input_tokens: usage.input, output_tokens: usage.output, total_tokens: usage.input + usage.output } },
+        usage: buildUsage(usage) },
     }),
   ];
 }
 
-export function serializeComplete(reply: ReplyObject, model: string): unknown {
+export function serializeComplete(reply: ReplyObject, model: string): Record<string, unknown> {
   const id = genId("resp");
   const createdAt = Math.floor(Date.now() / MS_PER_SECOND);
   const usage = reply.usage ?? DEFAULT_USAGE;
@@ -120,10 +124,10 @@ export function serializeComplete(reply: ReplyObject, model: string): unknown {
 
   return {
     id, object: "response", created_at: createdAt, status: "completed", model, output,
-    usage: { input_tokens: usage.input, output_tokens: usage.output, total_tokens: usage.input + usage.output },
+    usage: buildUsage(usage),
   };
 }
 
-export function serializeError(error: { status: number; message: string; type?: string }): unknown {
+export function serializeError(error: { status: number; message: string; type?: string }): Record<string, unknown> {
   return { type: "error", error: { message: error.message, type: error.type ?? "server_error", code: error.type ?? "server_error" } };
 }

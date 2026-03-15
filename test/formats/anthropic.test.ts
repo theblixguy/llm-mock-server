@@ -226,10 +226,10 @@ describe("Anthropic Format", () => {
         "claude-sonnet-4-6",
       ) as AnthropicComplete;
       const tool = result.content.find((c) => c.type === "tool_use");
-      expect(tool).toBeDefined();
-      expect(tool!.name).toBe("read_file");
-      expect(tool!.input).toEqual({ path: "/tmp" });
-      expect(tool!.id).toBeTypeOf("string");
+      if (!tool) throw new Error("expected tool_use content block");
+      expect(tool.name).toBe("read_file");
+      expect(tool.input).toEqual({ path: "/tmp" });
+      expect(tool.id).toBeTypeOf("string");
     });
 
     it("sets stop_reason to tool_use when tools present", () => {

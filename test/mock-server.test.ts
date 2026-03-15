@@ -299,7 +299,7 @@ describe("MockServer (end-to-end)", () => {
 
     it("throws on empty sequence", () => {
       expect(() => server.when("step").replySequence([])).toThrow(
-        "replySequence requires at least one entry",
+        "Sequence requires at least one entry",
       );
     });
   });

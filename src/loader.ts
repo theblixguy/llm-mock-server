@@ -3,9 +3,9 @@ import { join, extname } from "node:path";
 import JSON5 from "json5";
 import { z } from "zod";
 import type { Handler, Match, MatchObject, Reply } from "./types.js";
-import type { RuleEngine } from "./rule-engine.js";
+import { type RuleEngine, createSequenceResolver } from "./rule-engine.js";
 
-export interface LoadContext {
+interface LoadContext {
   engine: RuleEngine;
   setFallback?: (reply: Reply) => void;
 }
@@ -106,8 +106,7 @@ function addSequenceRule(
   templates: Templates,
   filePath: string,
 ): void {
-  let index = 0;
-  const resolved = entries.map((entry) => {
+  const steps = entries.map((entry) => {
     if (typeof entry === "string" || !("reply" in entry)) {
       return { reply: resolveReplyRef(entry, templates, filePath) };
     }
@@ -119,13 +118,10 @@ function addSequenceRule(
       },
     };
   });
-  const lastStep = resolved[resolved.length - 1]!;
-  const rule = engine.add(match, () => {
-    const step = resolved[index++] ?? lastStep;
-    rule.options = step.options ?? {};
-    return step.reply;
-  });
-  rule.remaining = resolved.length;
+  const rule = engine.add(match, "");
+  const { resolver, entryCount } = createSequenceResolver(steps, rule);
+  rule.resolve = resolver;
+  rule.remaining = entryCount;
 }
 
 async function loadJson5File(filePath: string, ctx: LoadContext): Promise<void> {

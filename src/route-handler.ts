@@ -37,7 +37,7 @@ async function resolveReply(
   }
 }
 
-export interface RouteHandlerDeps {
+interface RouteHandlerDeps {
   engine: RuleEngine;
   history: RequestHistory;
   logger: Logger;

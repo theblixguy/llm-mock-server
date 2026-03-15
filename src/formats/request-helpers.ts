@@ -1,37 +1,8 @@
-import type { FormatName, Message, MockRequest, ReplyObject, ToolDef } from "../types.js";
-
-export const MS_PER_SECOND = 1000;
-const BASE_36 = 36;
-export const DEFAULT_USAGE = { input: 10, output: 5 } as const;
+import type { FormatName, Message, MockRequest, ToolDef } from "../types.js";
 
 function asRecord(body: unknown): Record<string, unknown> {
   if (typeof body === "object" && body !== null) return body as Record<string, unknown>;
   return {};
-}
-
-export function splitText(text: string, chunkSize: number): string[] {
-  if (chunkSize <= 0 || text.length <= chunkSize) return [text];
-  const chunks: string[] = [];
-  for (let i = 0; i < text.length; i += chunkSize) {
-    chunks.push(text.slice(i, i + chunkSize));
-  }
-  return chunks;
-}
-
-export function genId(prefix: string): string {
-  return `${prefix}_${Date.now().toString(BASE_36)}`;
-}
-
-export function toolId(tool: { id?: string | undefined }, prefix: string, index: number): string {
-  return tool.id ?? `${prefix}_${Date.now().toString(BASE_36)}_${index}`;
-}
-
-export function shouldEmitText(reply: ReplyObject): boolean {
-  return Boolean(reply.text) || (!reply.tools?.length && !reply.reasoning);
-}
-
-export function finishReason(reply: ReplyObject, onTools: string, onStop: string): string {
-  return reply.tools?.length ? onTools : onStop;
 }
 
 export function isStreaming(body: unknown): boolean {
@@ -45,7 +16,7 @@ export interface RequestMeta {
 
 const EMPTY_META: RequestMeta = { headers: {}, path: "" };
 
-export interface ParsedBody {
+interface ParsedBody {
   readonly model?: string | undefined;
   readonly stream?: boolean | undefined;
 }

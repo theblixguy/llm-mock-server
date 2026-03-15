@@ -1,6 +1,10 @@
 import type { ReplyObject, ReplyOptions } from "../../types.js";
 import type { SSEChunk } from "../types.js";
-import { splitText, genId, toolId, shouldEmitText, finishReason, DEFAULT_USAGE } from "../parse-helpers.js";
+import { splitText, genId, toolId, shouldEmitText, finishReason, DEFAULT_USAGE } from "../serialize-helpers.js";
+
+function buildUsage(usage: { input: number; output: number }) {
+  return { input_tokens: usage.input, output_tokens: usage.output };
+}
 
 function contentBlock(index: number, startBlock: unknown, deltas: SSEChunk[]): SSEChunk[] {
   return [
@@ -52,7 +56,7 @@ export function serialize(reply: ReplyObject, model: string, options: ReplyOptio
   return [
     { event: "message_start", data: JSON.stringify({
       type: "message_start",
-      message: { id, type: "message", role: "assistant", model, content: [], stop_reason: null, usage: { input_tokens: usage.input, output_tokens: 0 } },
+      message: { id, type: "message", role: "assistant", model, content: [], stop_reason: null, usage: { ...buildUsage(usage), output_tokens: 0 } },
     })},
     ...reasoningChunks,
     ...textChunks,
@@ -66,7 +70,7 @@ export function serialize(reply: ReplyObject, model: string, options: ReplyOptio
   ];
 }
 
-export function serializeComplete(reply: ReplyObject, model: string): unknown {
+export function serializeComplete(reply: ReplyObject, model: string): Record<string, unknown> {
   const id = genId("msg");
   const usage = reply.usage ?? DEFAULT_USAGE;
 
@@ -82,10 +86,10 @@ export function serializeComplete(reply: ReplyObject, model: string): unknown {
     id, type: "message", role: "assistant", model, content,
     stop_reason: finishReason(reply, "tool_use", "end_turn"),
     stop_sequence: null,
-    usage: { input_tokens: usage.input, output_tokens: usage.output },
+    usage: buildUsage(usage),
   };
 }
 
-export function serializeError(error: { status: number; message: string; type?: string }): unknown {
+export function serializeError(error: { status: number; message: string; type?: string }): Record<string, unknown> {
   return { type: "error", error: { type: error.type ?? "api_error", message: error.message } };
 }

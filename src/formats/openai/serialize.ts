@@ -1,6 +1,16 @@
 import type { ReplyObject, ReplyOptions } from "../../types.js";
 import type { SSEChunk } from "../types.js";
-import { splitText, genId, toolId, finishReason, MS_PER_SECOND, DEFAULT_USAGE } from "../parse-helpers.js";
+import { splitText, genId, toolId, finishReason, MS_PER_SECOND, DEFAULT_USAGE } from "../serialize-helpers.js";
+
+function buildUsage(usage: { input: number; output: number }) {
+  return {
+    prompt_tokens: usage.input,
+    completion_tokens: usage.output,
+    total_tokens: usage.input + usage.output,
+    prompt_tokens_details: { cached_tokens: 0, audio_tokens: 0 },
+    completion_tokens_details: { reasoning_tokens: 0, audio_tokens: 0, accepted_prediction_tokens: 0, rejected_prediction_tokens: 0 },
+  };
+}
 
 function chunkEnvelope(
   id: string, created: number, model: string,
@@ -38,13 +48,7 @@ export function serialize(reply: ReplyObject, model: string, options: ReplyOptio
     }),
   );
 
-  const usageChunk = {
-    prompt_tokens: usage.input,
-    completion_tokens: usage.output,
-    total_tokens: usage.input + usage.output,
-    prompt_tokens_details: { cached_tokens: 0, audio_tokens: 0 },
-    completion_tokens_details: { reasoning_tokens: 0, audio_tokens: 0, accepted_prediction_tokens: 0, rejected_prediction_tokens: 0 },
-  };
+  const usageChunk = buildUsage(usage);
 
   return [
     chunkEnvelope(id, created, model, { role: "assistant" }),
@@ -56,7 +60,7 @@ export function serialize(reply: ReplyObject, model: string, options: ReplyOptio
   ];
 }
 
-export function serializeComplete(reply: ReplyObject, model: string): unknown {
+export function serializeComplete(reply: ReplyObject, model: string): Record<string, unknown> {
   const id = genId("chatcmpl");
   const created = Math.floor(Date.now() / MS_PER_SECOND);
   const usage = reply.usage ?? DEFAULT_USAGE;
@@ -77,16 +81,10 @@ export function serializeComplete(reply: ReplyObject, model: string): unknown {
     system_fingerprint: null,
     service_tier: "default",
     choices: [{ index: 0, message, logprobs: null, finish_reason: finishReason(reply, "tool_calls", "stop") }],
-    usage: {
-      prompt_tokens: usage.input,
-      completion_tokens: usage.output,
-      total_tokens: usage.input + usage.output,
-      prompt_tokens_details: { cached_tokens: 0, audio_tokens: 0 },
-      completion_tokens_details: { reasoning_tokens: 0, audio_tokens: 0, accepted_prediction_tokens: 0, rejected_prediction_tokens: 0 },
-    },
+    usage: buildUsage(usage),
   };
 }
 
-export function serializeError(error: { status: number; message: string; type?: string }): unknown {
+export function serializeError(error: { status: number; message: string; type?: string }): Record<string, unknown> {
   return { error: { message: error.message, type: error.type ?? "server_error", code: null } };
 }

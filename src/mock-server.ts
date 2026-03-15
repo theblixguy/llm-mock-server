@@ -3,7 +3,7 @@ import type { FastifyInstance } from "fastify";
 import type {
   Match, PendingRule, Reply, ReplyOptions, Resolver, Rule, RuleHandle, RuleSummary, SequenceEntry,
 } from "./types.js";
-import { RuleEngine } from "./rule-engine.js";
+import { RuleEngine, createSequenceResolver } from "./rule-engine.js";
 import { RequestHistory } from "./history.js";
 import { openaiFormat } from "./formats/openai/index.js";
 import { anthropicFormat } from "./formats/anthropic/index.js";
@@ -103,19 +103,15 @@ export class MockServer {
         return makeHandle(engine.add(match, response, options));
       },
       replySequence(entries: readonly SequenceEntry[]): RuleHandle {
-        if (entries.length === 0) throw new Error("replySequence requires at least one entry.");
-        let index = 0;
-        const last = entries[entries.length - 1]!;
-        const rule = engine.add(match, () => {
-          const entry = entries[index++] ?? last;
-          if (typeof entry === "string" || !("reply" in entry)) {
-            rule.options = {};
-            return entry;
-          }
-          rule.options = entry.options ?? {};
-          return entry.reply;
-        });
-        rule.remaining = entries.length;
+        const steps = entries.map((entry) =>
+          typeof entry === "string" || !("reply" in entry)
+            ? { reply: entry as Reply }
+            : { reply: entry.reply, options: entry.options },
+        );
+        const rule = engine.add(match, "");
+        const { resolver, entryCount } = createSequenceResolver(steps, rule);
+        rule.resolve = resolver;
+        rule.remaining = entryCount;
         return makeHandle(rule);
       },
     };

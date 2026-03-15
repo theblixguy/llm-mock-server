@@ -1,4 +1,4 @@
-import type { Match, MatchObject, MockRequest, Resolver, ReplyOptions, Rule, RuleSummary } from "./types.js";
+import type { Match, MatchObject, MockRequest, Resolver, Reply, ReplyOptions, Rule, RuleSummary } from "./types.js";
 
 function safeRegex(re: RegExp): RegExp {
   return (re.global || re.sticky) ? new RegExp(re.source, re.flags.replace(/[gy]/g, "")) : re;
@@ -59,6 +59,28 @@ function createRule(match: Match, resolve: Resolver, options: ReplyOptions, desc
     resolve,
     options,
     remaining: Infinity,
+  };
+}
+
+interface SequenceStep {
+  readonly reply: Reply;
+  readonly options?: ReplyOptions | undefined;
+}
+
+export function createSequenceResolver(
+  steps: readonly SequenceStep[],
+  rule: { options: ReplyOptions },
+): { resolver: () => Reply; entryCount: number } {
+  if (steps.length === 0) throw new Error("Sequence requires at least one entry.");
+  let index = 0;
+  const last = steps[steps.length - 1]!;
+  return {
+    resolver: () => {
+      const step = steps[index++] ?? last;
+      rule.options = step.options ?? {};
+      return step.reply;
+    },
+    entryCount: steps.length,
   };
 }
 

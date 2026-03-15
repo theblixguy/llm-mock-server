@@ -1,5 +1,5 @@
 import type { MockRequest, Message, ToolDef } from "../../types.js";
-import { buildMockRequest, type RequestMeta } from "../parse-helpers.js";
+import { buildMockRequest, type RequestMeta } from "../request-helpers.js";
 import { ResponsesRequestSchema, FunctionToolSchema, type ResponsesRequest } from "./schema.js";
 
 function extractInputContent(content: string | Record<string, unknown>[]): string {
