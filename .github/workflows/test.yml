@@ -27,6 +27,9 @@ jobs:
       - name: Type check
         run: tsc --noEmit && tsc --noEmit -p tsconfig.test.json
 
+      - name: Format check
+        run: npm run fmt:check
+
       - name: Lint
         run: npm run lint
 
