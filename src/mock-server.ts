@@ -1,7 +1,15 @@
 import Fastify from "fastify";
 import type { FastifyInstance } from "fastify";
 import type {
-  Match, PendingRule, Reply, ReplyOptions, Resolver, Rule, RuleHandle, RuleSummary, SequenceEntry,
+  Match,
+  PendingRule,
+  Reply,
+  ReplyOptions,
+  Resolver,
+  Rule,
+  RuleHandle,
+  RuleSummary,
+  SequenceEntry,
 } from "./types.js";
 import { RuleEngine, createSequenceResolver } from "./rule-engine.js";
 import { RequestHistory } from "./history.js";
@@ -13,7 +21,11 @@ import { Logger } from "./logger.js";
 import type { LogLevel } from "./logger.js";
 import { createRouteHandler } from "./route-handler.js";
 
-const formats: readonly Format[] = [openaiFormat, anthropicFormat, responsesFormat];
+const formats: readonly Format[] = [
+  openaiFormat,
+  anthropicFormat,
+  responsesFormat,
+];
 
 export interface MockServerOptions {
   readonly port?: number;
@@ -56,8 +68,12 @@ export class MockServer {
     this.host = options.host ?? "127.0.0.1";
     this.logger = new Logger(options.logLevel ?? "none");
     this.defaultOptions = {
-      ...(options.defaultLatency !== undefined && { latency: options.defaultLatency }),
-      ...(options.defaultChunkSize !== undefined && { chunkSize: options.defaultChunkSize }),
+      ...(options.defaultLatency !== undefined && {
+        latency: options.defaultLatency,
+      }),
+      ...(options.defaultChunkSize !== undefined && {
+        chunkSize: options.defaultChunkSize,
+      }),
     };
     this.app = Fastify({ logger: false });
 
@@ -171,10 +187,14 @@ export class MockServer {
     const { loadRulesFromPath } = await import("./loader.js");
     await loadRulesFromPath(pathOrDir, {
       engine: this.engine,
-      setFallback: (reply) => { this.fallbackReply = reply; },
+      setFallback: (reply) => {
+        this.fallbackReply = reply;
+      },
     });
     const loaded = this.engine.ruleCount - before;
-    this.logger.info(`Loaded ${loaded} rule${loaded !== 1 ? "s" : ""} from ${pathOrDir}`);
+    this.logger.info(
+      `Loaded ${loaded} rule${loaded !== 1 ? "s" : ""} from ${pathOrDir}`,
+    );
   }
 
   /** Every request the server has handled. */
@@ -197,7 +217,8 @@ export class MockServer {
 
   /** The base URL the server is listening on, e.g. `http://127.0.0.1:12345`. Throws if the server hasn't started. */
   get url(): string {
-    if (!this.listening) throw new Error("Server is not running. Call start() first.");
+    if (!this.listening)
+      throw new Error("Server is not running. Call start() first.");
     const addr = this.app.server.address();
     const port = addr !== null && typeof addr === "object" ? addr.port : 0;
     return `http://${this.host}:${port}`;

@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createMock, MockServer } from "../src/index.js";
 
 interface OpenAIResponse {
-  choices: { message: { role: string; content: string }; finish_reason: string }[];
+  choices: {
+    message: { role: string; content: string };
+    finish_reason: string;
+  }[];
   error?: { type: string; message: string };
 }
 
@@ -34,7 +37,10 @@ describe("MockServer (end-to-end)", () => {
     });
   }
 
-  async function postOpenAI(content: string, opts: Record<string, unknown> = {}): Promise<OpenAIResponse> {
+  async function postOpenAI(
+    content: string,
+    opts: Record<string, unknown> = {},
+  ): Promise<OpenAIResponse> {
     const res = await post("/v1/chat/completions", {
       model: "gpt-5.4",
       messages: [{ role: "user", content }],
@@ -44,7 +50,10 @@ describe("MockServer (end-to-end)", () => {
     return res.json() as Promise<OpenAIResponse>;
   }
 
-  async function postAnthropic(content: string, opts: Record<string, unknown> = {}): Promise<AnthropicResponse> {
+  async function postAnthropic(
+    content: string,
+    opts: Record<string, unknown> = {},
+  ): Promise<AnthropicResponse> {
     const res = await post("/v1/messages", {
       model: "claude-sonnet-4-6",
       messages: [{ role: "user", content }],
@@ -55,7 +64,10 @@ describe("MockServer (end-to-end)", () => {
     return res.json() as Promise<AnthropicResponse>;
   }
 
-  async function postResponses(input: string, opts: Record<string, unknown> = {}): Promise<ResponsesAPIResponse> {
+  async function postResponses(
+    input: string,
+    opts: Record<string, unknown> = {},
+  ): Promise<ResponsesAPIResponse> {
     const res = await post("/v1/responses", {
       model: "codex-mini",
       input,
@@ -216,7 +228,10 @@ describe("MockServer (end-to-end)", () => {
       server.when("hello").reply("Hi!");
       await fetch(`${server.url}/v1/chat/completions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-Custom": "test-value" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Custom": "test-value",
+        },
         body: JSON.stringify({
           model: "gpt-5.4",
           messages: [{ role: "user", content: "hello" }],
@@ -232,7 +247,9 @@ describe("MockServer (end-to-end)", () => {
 
   describe("request metadata in predicates", () => {
     it("matches on headers", async () => {
-      server.when({ predicate: (req) => req.headers["x-team"] === "alpha" }).reply("Alpha team!");
+      server
+        .when({ predicate: (req) => req.headers["x-team"] === "alpha" })
+        .reply("Alpha team!");
       server.when("hello").reply("Default");
 
       const res = await fetch(`${server.url}/v1/chat/completions`, {
@@ -288,10 +305,12 @@ describe("MockServer (end-to-end)", () => {
     });
 
     it("supports per-step options", async () => {
-      server.when("step").replySequence([
-        "Plain.",
-        { reply: { text: "With options." }, options: { chunkSize: 5 } },
-      ]);
+      server
+        .when("step")
+        .replySequence([
+          "Plain.",
+          { reply: { text: "With options." }, options: { chunkSize: 5 } },
+        ]);
 
       const json = await postOpenAI("step");
       expect(json.choices[0]!.message.content).toBe("Plain.");
@@ -407,7 +426,9 @@ describe("MockServer (end-to-end)", () => {
     });
 
     it("error reply works as a normal rule", async () => {
-      server.when("fail").reply({ error: { status: 500, message: "Internal error" } });
+      server
+        .when("fail")
+        .reply({ error: { status: 500, message: "Internal error" } });
       server.when("hello").reply("Hi!");
 
       const r1 = await post("/v1/chat/completions", {
@@ -437,11 +458,13 @@ describe("MockServer (end-to-end)", () => {
       const contentDeltas = data
         .filter((d) => d !== "[DONE]")
         .map((d) => JSON.parse(d))
-        .filter((d: { choices?: { delta?: { content?: string } }[] }) =>
-          d.choices?.[0]?.delta?.content !== undefined,
+        .filter(
+          (d: { choices?: { delta?: { content?: string } }[] }) =>
+            d.choices?.[0]?.delta?.content !== undefined,
         )
-        .map((d: { choices: { delta: { content: string } }[] }) =>
-          d.choices[0]!.delta.content,
+        .map(
+          (d: { choices: { delta: { content: string } }[] }) =>
+            d.choices[0]!.delta.content,
         );
       expect(contentDeltas.length).toBe(3);
       expect(contentDeltas.join("")).toBe("Hello, world!");
@@ -454,7 +477,12 @@ describe("MockServer (end-to-end)", () => {
       server.fallback("No match.");
 
       const j1 = await postOpenAI("what's the weather?", {
-        tools: [{ type: "function", function: { name: "get_weather", parameters: {} } }],
+        tools: [
+          {
+            type: "function",
+            function: { name: "get_weather", parameters: {} },
+          },
+        ],
       });
       expect(j1.choices[0]!.message.content).toBe("Weather tool detected!");
 
@@ -471,7 +499,17 @@ describe("MockServer (end-to-end)", () => {
       const json = await postOpenAI("use the tool", {
         messages: [
           { role: "user", content: "use the tool" },
-          { role: "assistant", content: null, tool_calls: [{ id: "call_abc", type: "function", function: { name: "test", arguments: "{}" } }] },
+          {
+            role: "assistant",
+            content: null,
+            tool_calls: [
+              {
+                id: "call_abc",
+                type: "function",
+                function: { name: "test", arguments: "{}" },
+              },
+            ],
+          },
           { role: "tool", tool_call_id: "call_abc", content: "result data" },
         ],
       });
@@ -505,7 +543,9 @@ describe("MockServer (end-to-end)", () => {
 
   describe("resolver error handling", () => {
     it("falls back when resolver throws", async () => {
-      server.when("boom").reply(() => { throw new Error("resolver failed"); });
+      server.when("boom").reply(() => {
+        throw new Error("resolver failed");
+      });
       server.fallback("Safe fallback.");
 
       const json = await postOpenAI("boom");
@@ -530,20 +570,34 @@ describe("MockServer (end-to-end)", () => {
       await fetch(`${s.url}/v1/chat/completions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "gpt-5.4", messages: [{ role: "user", content: "test" }], stream: false }),
+        body: JSON.stringify({
+          model: "gpt-5.4",
+          messages: [{ role: "user", content: "test" }],
+          stream: false,
+        }),
       });
 
       await fetch(`${s.url}/v1/chat/completions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "gpt-5.4", messages: [{ role: "user", content: "unmatched" }], stream: false }),
+        body: JSON.stringify({
+          model: "gpt-5.4",
+          messages: [{ role: "user", content: "unmatched" }],
+          stream: false,
+        }),
       });
 
-      s.when("throw").reply(() => { throw new Error("boom"); });
+      s.when("throw").reply(() => {
+        throw new Error("boom");
+      });
       await fetch(`${s.url}/v1/chat/completions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "gpt-5.4", messages: [{ role: "user", content: "throw" }], stream: false }),
+        body: JSON.stringify({
+          model: "gpt-5.4",
+          messages: [{ role: "user", content: "throw" }],
+          stream: false,
+        }),
       });
 
       await s.stop();

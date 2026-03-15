@@ -108,7 +108,9 @@ describe("parse-helpers", () => {
     });
 
     it("returns true when reply has text and tools", () => {
-      expect(shouldEmitText({ text: "hi", tools: [{ name: "fn", args: {} }] })).toBe(true);
+      expect(
+        shouldEmitText({ text: "hi", tools: [{ name: "fn", args: {} }] }),
+      ).toBe(true);
     });
 
     it("returns true for empty text with no tools or reasoning", () => {
@@ -169,7 +171,9 @@ describe("parse-helpers", () => {
         [{ role: "user", content: "hello" }],
         undefined,
         "gpt-4",
-        { messages: [] },
+        {
+          messages: [],
+        },
       );
 
       expect(result.format).toBe("openai");
@@ -214,7 +218,14 @@ describe("parse-helpers", () => {
         { role: "assistant" as const, content: "reply" },
         { role: "user" as const, content: "second" },
       ];
-      const result = buildMockRequest("openai", {}, messages, undefined, "m", {});
+      const result = buildMockRequest(
+        "openai",
+        {},
+        messages,
+        undefined,
+        "m",
+        {},
+      );
       expect(result.lastMessage).toBe("second");
     });
 
@@ -223,7 +234,14 @@ describe("parse-helpers", () => {
         { role: "system" as const, content: "be helpful" },
         { role: "user" as const, content: "hi" },
       ];
-      const result = buildMockRequest("openai", {}, messages, undefined, "m", {});
+      const result = buildMockRequest(
+        "openai",
+        {},
+        messages,
+        undefined,
+        "m",
+        {},
+      );
       expect(result.systemMessage).toBe("be helpful");
     });
 
@@ -241,12 +259,26 @@ describe("parse-helpers", () => {
         { role: "tool" as const, content: "result1", toolCallId: "call_1" },
         { role: "tool" as const, content: "result2", toolCallId: "call_2" },
       ];
-      const result = buildMockRequest("openai", {}, messages, undefined, "m", {});
+      const result = buildMockRequest(
+        "openai",
+        {},
+        messages,
+        undefined,
+        "m",
+        {},
+      );
       expect(result.lastToolCallId).toBe("call_2");
     });
 
     it("sets streaming to false when stream is false", () => {
-      const result = buildMockRequest("openai", { stream: false }, [], undefined, "m", {});
+      const result = buildMockRequest(
+        "openai",
+        { stream: false },
+        [],
+        undefined,
+        "m",
+        {},
+      );
       expect(result.streaming).toBe(false);
     });
 
@@ -255,7 +287,15 @@ describe("parse-helpers", () => {
         headers: { authorization: "Bearer sk-test" },
         path: "/v1/chat/completions",
       };
-      const result = buildMockRequest("openai", {}, [], undefined, "m", {}, meta);
+      const result = buildMockRequest(
+        "openai",
+        {},
+        [],
+        undefined,
+        "m",
+        {},
+        meta,
+      );
       expect(result.headers).toEqual({ authorization: "Bearer sk-test" });
       expect(result.path).toBe("/v1/chat/completions");
     });

@@ -1,8 +1,14 @@
 import type { MockRequest, Message, ToolDef } from "../../types.js";
 import { buildMockRequest, type RequestMeta } from "../request-helpers.js";
-import { ResponsesRequestSchema, FunctionToolSchema, type ResponsesRequest } from "./schema.js";
+import {
+  ResponsesRequestSchema,
+  FunctionToolSchema,
+  type ResponsesRequest,
+} from "./schema.js";
 
-function extractInputContent(content: string | Record<string, unknown>[]): string {
+function extractInputContent(
+  content: string | Record<string, unknown>[],
+): string {
   if (typeof content === "string") return content;
   return content
     .filter((b) => b["type"] === "input_text" || b["type"] === "text")
@@ -52,5 +58,13 @@ function parseTools(req: ResponsesRequest): readonly ToolDef[] | undefined {
 
 export function parseRequest(body: unknown, meta?: RequestMeta): MockRequest {
   const req = ResponsesRequestSchema.parse(body);
-  return buildMockRequest("responses", req, parseInput(req), parseTools(req), "codex-mini", body, meta);
+  return buildMockRequest(
+    "responses",
+    req,
+    parseInput(req),
+    parseTools(req),
+    "codex-mini",
+    body,
+    meta,
+  );
 }

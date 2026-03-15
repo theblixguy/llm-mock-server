@@ -29,7 +29,9 @@ export function parseLogLevel(value: string): LogLevel {
 
 export async function parseHost(value: string): Promise<string> {
   if (!value) {
-    throw new Error(`Invalid host "${value}". Must be a resolvable hostname or IP address.`);
+    throw new Error(
+      `Invalid host "${value}". Must be a resolvable hostname or IP address.`,
+    );
   }
   if (value === "localhost" || isIP(value) !== 0) {
     return value;
@@ -38,14 +40,18 @@ export async function parseHost(value: string): Promise<string> {
     await lookup(value);
     return value;
   } catch {
-    throw new Error(`Invalid host "${value}". Must be a resolvable hostname or IP address.`);
+    throw new Error(
+      `Invalid host "${value}". Must be a resolvable hostname or IP address.`,
+    );
   }
 }
 
 export function parseChunkSize(value: string): number {
   const size = parseInt(value, 10);
   if (isNaN(size) || size < 0) {
-    throw new Error(`Invalid chunk size "${value}". Must be a non-negative integer.`);
+    throw new Error(
+      `Invalid chunk size "${value}". Must be a non-negative integer.`,
+    );
   }
   return size;
 }
@@ -53,7 +59,9 @@ export function parseChunkSize(value: string): number {
 export function parseLatency(value: string): number {
   const ms = parseInt(value, 10);
   if (isNaN(ms) || ms < 0) {
-    throw new Error(`Invalid latency "${value}". Must be a non-negative integer (ms).`);
+    throw new Error(
+      `Invalid latency "${value}". Must be a non-negative integer (ms).`,
+    );
   }
   return ms;
 }

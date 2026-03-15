@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { parsePort, parseHost, parseChunkSize, parseLogLevel, parseLatency } from "../src/cli-validators.js";
+import {
+  parsePort,
+  parseHost,
+  parseChunkSize,
+  parseLogLevel,
+  parseLatency,
+} from "../src/cli-validators.js";
 
 describe("parsePort", () => {
   it("parses a valid port", () => {
@@ -48,7 +54,9 @@ describe("parseLogLevel", () => {
   );
 
   it("throws on invalid level", () => {
-    expect(() => parseLogLevel("verbose")).toThrow('Invalid log level "verbose"');
+    expect(() => parseLogLevel("verbose")).toThrow(
+      'Invalid log level "verbose"',
+    );
   });
 
   it("throws on empty string", () => {
@@ -78,11 +86,15 @@ describe("parseHost", () => {
   });
 
   it("rejects an unresolvable hostname", async () => {
-    await expect(parseHost("not.a.real.host.invalid")).rejects.toThrow("Invalid host");
+    await expect(parseHost("not.a.real.host.invalid")).rejects.toThrow(
+      "Invalid host",
+    );
   });
 
   it("rejects a string with spaces", async () => {
-    await expect(parseHost("local host")).rejects.toThrow('Invalid host "local host"');
+    await expect(parseHost("local host")).rejects.toThrow(
+      'Invalid host "local host"',
+    );
   });
 });
 

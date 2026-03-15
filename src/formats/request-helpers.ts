@@ -1,7 +1,8 @@
 import type { FormatName, Message, MockRequest, ToolDef } from "../types.js";
 
 function asRecord(body: unknown): Record<string, unknown> {
-  if (typeof body === "object" && body !== null) return body as Record<string, unknown>;
+  if (typeof body === "object" && body !== null)
+    return body as Record<string, unknown>;
   return {};
 }
 

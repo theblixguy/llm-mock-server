@@ -37,7 +37,9 @@ import type { MockServerOptions } from "./mock-server.js";
  * await server.stop();
  * ```
  */
-export async function createMock(options: MockServerOptions = {}): Promise<MockServer> {
+export async function createMock(
+  options: MockServerOptions = {},
+): Promise<MockServer> {
   const server = new MockServer(options);
   await server.start(options.port ?? 0);
   return server;

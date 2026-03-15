@@ -2,7 +2,9 @@ import type { MockRequest, Message, ToolDef } from "../../types.js";
 import { buildMockRequest, type RequestMeta } from "../request-helpers.js";
 import { OpenAIRequestSchema, type OpenAIRequest } from "./schema.js";
 
-function extractContent(content: OpenAIRequest["messages"][number]["content"]): string {
+function extractContent(
+  content: OpenAIRequest["messages"][number]["content"],
+): string {
   if (content == null) return "";
   if (typeof content === "string") return content;
   return content
@@ -30,5 +32,13 @@ function parseTools(req: OpenAIRequest): readonly ToolDef[] | undefined {
 
 export function parseRequest(body: unknown, meta?: RequestMeta): MockRequest {
   const req = OpenAIRequestSchema.parse(body);
-  return buildMockRequest("openai", req, parseMessages(req), parseTools(req), "gpt-5.4", body, meta);
+  return buildMockRequest(
+    "openai",
+    req,
+    parseMessages(req),
+    parseTools(req),
+    "gpt-5.4",
+    body,
+    meta,
+  );
 }

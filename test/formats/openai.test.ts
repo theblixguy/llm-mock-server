@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { openaiFormat } from "../../src/formats/openai/index.js";
-import type { OpenAIChunk, OpenAIComplete, OpenAIError } from "../../src/formats/openai/schema.js";
+import type {
+  OpenAIChunk,
+  OpenAIComplete,
+  OpenAIError,
+} from "../../src/formats/openai/schema.js";
 
 function parse<T>(chunk: { data: string }): T {
   return JSON.parse(chunk.data) as T;
@@ -26,12 +30,19 @@ describe("OpenAI Format", () => {
     });
 
     it("defaults stream to true", () => {
-      const req = openaiFormat.parseRequest({ model: "gpt-5.4", messages: [{ role: "user", content: "hi" }] });
+      const req = openaiFormat.parseRequest({
+        model: "gpt-5.4",
+        messages: [{ role: "user", content: "hi" }],
+      });
       expect(req.streaming).toBe(true);
     });
 
     it("detects stream: false", () => {
-      const req = openaiFormat.parseRequest({ model: "gpt-5.4", messages: [{ role: "user", content: "hi" }], stream: false });
+      const req = openaiFormat.parseRequest({
+        model: "gpt-5.4",
+        messages: [{ role: "user", content: "hi" }],
+        stream: false,
+      });
       expect(req.streaming).toBe(false);
     });
 
@@ -39,7 +50,16 @@ describe("OpenAI Format", () => {
       const req = openaiFormat.parseRequest({
         model: "gpt-5.4",
         messages: [{ role: "user", content: "read file" }],
-        tools: [{ type: "function", function: { name: "read_file", description: "Read a file", parameters: {} } }],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "read_file",
+              description: "Read a file",
+              parameters: {},
+            },
+          },
+        ],
       });
       expect(req.tools).toHaveLength(1);
       expect(req.tools![0]!.name).toBe("read_file");
@@ -71,22 +91,28 @@ describe("OpenAI Format", () => {
     it("handles non-string content (array of content parts)", () => {
       const req = openaiFormat.parseRequest({
         model: "gpt-5.4",
-        messages: [{ role: "user", content: [{ type: "text", text: "Hello" }] }],
+        messages: [
+          { role: "user", content: [{ type: "text", text: "Hello" }] },
+        ],
       });
       expect(req.lastMessage).toContain("Hello");
     });
 
     it("rejects requests with invalid role values", () => {
-      expect(() => openaiFormat.parseRequest({
-        model: "gpt-5.4",
-        messages: [{ role: "banana", content: "hi" }],
-      })).toThrow();
+      expect(() =>
+        openaiFormat.parseRequest({
+          model: "gpt-5.4",
+          messages: [{ role: "banana", content: "hi" }],
+        }),
+      ).toThrow();
     });
 
     it("rejects requests missing model", () => {
-      expect(() => openaiFormat.parseRequest({
-        messages: [{ role: "user", content: "hi" }],
-      })).toThrow();
+      expect(() =>
+        openaiFormat.parseRequest({
+          messages: [{ role: "user", content: "hi" }],
+        }),
+      ).toThrow();
     });
   });
 
@@ -123,14 +149,19 @@ describe("OpenAI Format", () => {
     });
 
     it("includes usage chunk before [DONE]", () => {
-      const chunks = openaiFormat.serialize({ text: "Hello", usage: { input: 10, output: 5 } }, "gpt-5.4");
+      const chunks = openaiFormat.serialize(
+        { text: "Hello", usage: { input: 10, output: 5 } },
+        "gpt-5.4",
+      );
       const usageChunk = parse<OpenAIChunk>(chunks.at(-2)!);
       expect(usageChunk.usage).toMatchObject({
         prompt_tokens: 10,
         completion_tokens: 5,
         total_tokens: 15,
       });
-      expect(usageChunk.usage?.completion_tokens_details?.reasoning_tokens).toBe(0);
+      expect(
+        usageChunk.usage?.completion_tokens_details?.reasoning_tokens,
+      ).toBe(0);
       expect(usageChunk.usage?.prompt_tokens_details?.cached_tokens).toBe(0);
     });
 
@@ -144,7 +175,8 @@ describe("OpenAI Format", () => {
         return parse<OpenAIChunk>(c).choices[0]?.delta.tool_calls !== undefined;
       });
       expect(toolChunk).toBeDefined();
-      const tc = parse<OpenAIChunk>(toolChunk!).choices[0]!.delta.tool_calls![0]!;
+      const tc = parse<OpenAIChunk>(toolChunk!).choices[0]!.delta
+        .tool_calls![0]!;
       expect(tc.type).toBe("function");
       expect(tc.id).toBeTypeOf("string");
       expect(tc.function.name).toBe("read_file");
@@ -158,7 +190,11 @@ describe("OpenAI Format", () => {
     });
 
     it("splits text into multiple delta chunks with chunkSize", () => {
-      const chunks = openaiFormat.serialize({ text: "Hello, world!" }, "gpt-5.4", { chunkSize: 5 });
+      const chunks = openaiFormat.serialize(
+        { text: "Hello, world!" },
+        "gpt-5.4",
+        { chunkSize: 5 },
+      );
       const contentDeltas = chunks
         .filter((c) => c.data !== "[DONE]")
         .map((c) => parse<OpenAIChunk>(c))
@@ -169,7 +205,9 @@ describe("OpenAI Format", () => {
 
     it("all chunks share same id and created timestamp", () => {
       const chunks = openaiFormat.serialize({ text: "Hello" }, "gpt-5.4");
-      const dataChunks = chunks.filter((c) => c.data !== "[DONE]").map((c) => parse<OpenAIChunk>(c));
+      const dataChunks = chunks
+        .filter((c) => c.data !== "[DONE]")
+        .map((c) => parse<OpenAIChunk>(c));
       const ids = dataChunks.map((c) => c.id);
       const created = dataChunks.map((c) => c.created);
       expect(new Set(ids).size).toBe(1);
@@ -179,7 +217,10 @@ describe("OpenAI Format", () => {
 
   describe("serializeComplete (non-streaming)", () => {
     it("produces correct top-level structure", () => {
-      const result = openaiFormat.serializeComplete({ text: "Hello, world!" }, "gpt-5.4") as OpenAIComplete;
+      const result = openaiFormat.serializeComplete(
+        { text: "Hello, world!" },
+        "gpt-5.4",
+      ) as OpenAIComplete;
       expect(result.object).toBe("chat.completion");
       expect(result.model).toBe("gpt-5.4");
       expect(result.id).toBeTypeOf("string");
@@ -187,7 +228,10 @@ describe("OpenAI Format", () => {
     });
 
     it("message has correct content and finish_reason", () => {
-      const result = openaiFormat.serializeComplete({ text: "Hello, world!" }, "gpt-5.4") as OpenAIComplete;
+      const result = openaiFormat.serializeComplete(
+        { text: "Hello, world!" },
+        "gpt-5.4",
+      ) as OpenAIComplete;
       expect(result.choices[0]!.message.role).toBe("assistant");
       expect(result.choices[0]!.message.content).toBe("Hello, world!");
       expect(result.choices[0]!.finish_reason).toBe("stop");
@@ -210,33 +254,50 @@ describe("OpenAI Format", () => {
         { text: "hi", usage: { input: 20, output: 15 } },
         "gpt-5.4",
       ) as OpenAIComplete;
-      expect(result.usage).toMatchObject({ prompt_tokens: 20, completion_tokens: 15, total_tokens: 35 });
+      expect(result.usage).toMatchObject({
+        prompt_tokens: 20,
+        completion_tokens: 15,
+        total_tokens: 35,
+      });
       expect(result.usage?.completion_tokens_details?.reasoning_tokens).toBe(0);
       expect(result.usage?.prompt_tokens_details?.cached_tokens).toBe(0);
     });
 
     it("includes service_tier and system_fingerprint", () => {
-      const result = openaiFormat.serializeComplete({ text: "hi" }, "gpt-5.4") as OpenAIComplete;
+      const result = openaiFormat.serializeComplete(
+        { text: "hi" },
+        "gpt-5.4",
+      ) as OpenAIComplete;
       expect(result.service_tier).toBe("default");
       expect(result.system_fingerprint).toBeNull();
     });
 
     it("includes logprobs: null on choices", () => {
-      const result = openaiFormat.serializeComplete({ text: "hi" }, "gpt-5.4") as OpenAIComplete;
+      const result = openaiFormat.serializeComplete(
+        { text: "hi" },
+        "gpt-5.4",
+      ) as OpenAIComplete;
       expect(result.choices[0]!.logprobs).toBeNull();
     });
   });
 
   describe("serializeError", () => {
     it("produces OpenAI error format", () => {
-      const result = openaiFormat.serializeError({ status: 429, message: "Rate limited", type: "rate_limit_error" }) as OpenAIError;
+      const result = openaiFormat.serializeError({
+        status: 429,
+        message: "Rate limited",
+        type: "rate_limit_error",
+      }) as OpenAIError;
       expect(result.error.message).toBe("Rate limited");
       expect(result.error.type).toBe("rate_limit_error");
       expect(result.error.code).toBeNull();
     });
 
     it("defaults type to server_error", () => {
-      const result = openaiFormat.serializeError({ status: 500, message: "Internal" }) as OpenAIError;
+      const result = openaiFormat.serializeError({
+        status: 500,
+        message: "Internal",
+      }) as OpenAIError;
       expect(result.error.type).toBe("server_error");
     });
   });

@@ -4,18 +4,27 @@ import { AnthropicRequestSchema, type AnthropicRequest } from "./schema.js";
 
 function extractSystem(system: AnthropicRequest["system"]): Message[] {
   if (system == null) return [];
-  if (typeof system === "string") return system ? [{ role: "system", content: system }] : [];
+  if (typeof system === "string")
+    return system ? [{ role: "system", content: system }] : [];
   const text = system.map((b) => b.text).join("\n");
   return text ? [{ role: "system", content: text }] : [];
 }
 
-function extractContent(content: AnthropicRequest["messages"][number]["content"]): { content: string; toolCallId?: string | undefined } {
+function extractContent(
+  content: AnthropicRequest["messages"][number]["content"],
+): {
+  content: string;
+  toolCallId?: string | undefined;
+} {
   if (typeof content === "string") return { content };
   const text = content
     .filter((b): b is { type: "text"; text: string } => b.type === "text")
     .map((b) => b.text)
     .join("\n");
-  const toolResult = content.find((b): b is { type: "tool_result"; tool_use_id: string } => b.type === "tool_result");
+  const toolResult = content.find(
+    (b): b is { type: "tool_result"; tool_use_id: string } =>
+      b.type === "tool_result",
+  );
   const toolCallId = toolResult?.tool_use_id;
   return { content: text, toolCallId };
 }
@@ -27,7 +36,9 @@ function parseMessages(req: AnthropicRequest): readonly Message[] {
     return {
       role: m.role,
       content: extracted.content,
-      ...(extracted.toolCallId !== undefined && { toolCallId: extracted.toolCallId }),
+      ...(extracted.toolCallId !== undefined && {
+        toolCallId: extracted.toolCallId,
+      }),
     };
   });
   return [...system, ...conversation];
@@ -44,5 +55,13 @@ function parseTools(req: AnthropicRequest): readonly ToolDef[] | undefined {
 
 export function parseRequest(body: unknown, meta?: RequestMeta): MockRequest {
   const req = AnthropicRequestSchema.parse(body);
-  return buildMockRequest("anthropic", req, parseMessages(req), parseTools(req), "claude-sonnet-4-6", body, meta);
+  return buildMockRequest(
+    "anthropic",
+    req,
+    parseMessages(req),
+    parseTools(req),
+    "claude-sonnet-4-6",
+    body,
+    meta,
+  );
 }
