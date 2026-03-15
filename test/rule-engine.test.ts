@@ -1,21 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { RuleEngine } from "../src/rule-engine.js";
-import type { MockRequest } from "../src/types.js";
-
-function makeReq(overrides: Partial<MockRequest> = {}): MockRequest {
-  return {
-    format: "openai",
-    model: "gpt-5.4",
-    streaming: true,
-    messages: [{ role: "user", content: "hello" }],
-    lastMessage: "hello",
-    systemMessage: "",
-    toolNames: [],
-    lastToolCallId: undefined,
-    raw: {},
-    ...overrides,
-  };
-}
+import { makeReq } from "./helpers/make-req.js";
 
 describe("RuleEngine", () => {
   let engine: RuleEngine;
@@ -27,8 +12,8 @@ describe("RuleEngine", () => {
   it("matches a string (substring, case-insensitive)", () => {
     engine.add("hello", "Hi!");
     const rule = engine.match(makeReq({ lastMessage: "say Hello world" }));
-    expect(rule).toBeDefined();
-    expect(rule!.description).toBe('"hello"');
+    if (!rule) throw new Error("expected match");
+    expect(rule.description).toBe('"hello"');
   });
 
   it("matches a regex", () => {
@@ -80,7 +65,8 @@ describe("RuleEngine", () => {
     engine.add("hello", "First");
     engine.add("hello", "Second");
     const rule = engine.match(makeReq());
-    expect(rule!.resolve).toBe("First");
+    if (!rule) throw new Error("expected match");
+    expect(rule.resolve).toBe("First");
   });
 
   it("returns undefined when no rules match", () => {
@@ -155,7 +141,8 @@ describe("RuleEngine", () => {
       const rule = engine.add("hello", "Second");
       engine.moveToFront(rule);
       const matched = engine.match(makeReq());
-      expect(matched!.resolve).toBe("Second");
+      if (!matched) throw new Error("expected match");
+      expect(matched.resolve).toBe("Second");
     });
   });
 
@@ -165,9 +152,8 @@ describe("RuleEngine", () => {
         { model: "gpt-5.4", predicate: (req) => req.messages.length > 2 },
         "Complex match",
       );
-      // Model matches but predicate fails (only 1 message)
       expect(engine.match(makeReq({ model: "gpt-5.4" }))).toBeUndefined();
-      // Both model and predicate pass
+
       expect(engine.match(makeReq({
         model: "gpt-5.4",
         messages: [

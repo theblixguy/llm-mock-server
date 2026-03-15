@@ -275,10 +275,10 @@ describe("Responses Format", () => {
         "codex-mini",
       ) as ResponsesComplete;
       const fnCall = result.output.find((o) => o.type === "function_call");
-      expect(fnCall).toBeDefined();
-      expect(fnCall!.name).toBe("read_file");
-      expect(fnCall!.status).toBe("completed");
-      expect(fnCall!.call_id).toBeTypeOf("string");
+      if (!fnCall) throw new Error("expected function_call output");
+      expect(fnCall.name).toBe("read_file");
+      expect(fnCall.status).toBe("completed");
+      expect(fnCall.call_id).toBeTypeOf("string");
     });
 
     it("includes usage tokens", () => {

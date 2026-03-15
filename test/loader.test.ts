@@ -4,25 +4,9 @@ import { join } from "node:path";
 import { RuleEngine } from "../src/rule-engine.js";
 import { loadRulesFromPath } from "../src/loader.js";
 import type { MockRequest } from "../src/types.js";
+import { makeReq } from "./helpers/make-req.js";
 
 const tmpDir = join(import.meta.dirname, ".tmp-loader-test");
-
-function makeReq(overrides: Partial<MockRequest> = {}): MockRequest {
-  return {
-    format: "openai",
-    model: "gpt-5.4",
-    streaming: true,
-    messages: [{ role: "user", content: "hello" }],
-    lastMessage: "hello",
-    systemMessage: "",
-    toolNames: [],
-    lastToolCallId: undefined,
-    raw: {},
-    headers: {},
-    path: "/v1/chat/completions",
-    ...overrides,
-  };
-}
 
 describe("Loader", () => {
   let engine: RuleEngine;
@@ -57,8 +41,8 @@ describe("Loader", () => {
       expect(engine.ruleCount).toBe(2);
 
       const match1 = engine.match(makeReq({ lastMessage: "Please explain recursion" }));
-      expect(match1).toBeDefined();
-      expect(match1!.resolve).toBe("A function that calls itself.");
+      if (!match1) throw new Error("expected match for 'explain'");
+      expect(match1.resolve).toBe("A function that calls itself.");
 
       const match2 = engine.match(makeReq({ model: "gpt-5.4", lastMessage: "hello" }));
       expect(match2).toBeDefined();
@@ -154,12 +138,12 @@ describe("Loader", () => {
 
       const req = makeReq({ lastMessage: "step" });
       const match1 = engine.match(req);
-      expect(match1).toBeDefined();
-      expect((match1!.resolve as () => string)()).toBe("First.");
+      if (!match1) throw new Error("expected match1");
+      expect((match1.resolve as () => string)()).toBe("First.");
 
       const match2 = engine.match(req);
-      expect(match2).toBeDefined();
-      expect((match2!.resolve as () => string)()).toBe("Second.");
+      if (!match2) throw new Error("expected match2");
+      expect((match2.resolve as () => string)()).toBe("Second.");
 
       expect(engine.match(req)).toBeUndefined();
     });
@@ -200,8 +184,8 @@ describe("Loader", () => {
       expect(engine.ruleCount).toBe(1);
 
       const match = engine.match(makeReq({ lastMessage: "summarize this article" }));
-      expect(match).toBeDefined();
-      expect(match!.resolve).toBeTypeOf("function");
+      if (!match) throw new Error("expected match for 'summarize'");
+      expect(match.resolve).toBeTypeOf("function");
     });
 
     it("loads an array of handlers from a .ts file", async () => {
@@ -240,9 +224,9 @@ describe("Loader", () => {
 
       await loadRulesFromPath(handlerPath, { engine });
       const rule = engine.match(makeReq({ lastMessage: "echo this" }));
-      expect(rule).toBeDefined();
+      if (!rule) throw new Error("expected match for 'echo'");
 
-      const resolver = rule!.resolve as (req: MockRequest) => string;
+      const resolver = rule.resolve as (req: MockRequest) => string;
       const result = resolver(makeReq({ lastMessage: "echo this" }));
       expect(result).toBe("Echo: echo this");
     });
