@@ -64,13 +64,13 @@ export class MockServer implements RuleAPI {
   private fallbackReply: Reply = "Mock server: no matching rule.";
   private listening = false;
 
-  /** @see RuleBuilder.when */
+  /** Register a matching rule. Call `.reply()` on the result to set the response. */
   when = this.rules_.when.bind(this.rules_);
-  /** @see RuleBuilder.whenTool */
+  /** Shorthand for `when({ toolName })`. */
   whenTool = this.rules_.whenTool.bind(this.rules_);
-  /** @see RuleBuilder.whenToolResult */
+  /** Shorthand for `when({ toolCallId })`. */
   whenToolResult = this.rules_.whenToolResult.bind(this.rules_);
-  /** @see RuleBuilder.nextError */
+  /** Queue a one-shot error for the very next request. Fires once then removes itself. */
   nextError = this.rules_.nextError.bind(this.rules_);
 
   constructor(options: MockServerOptions = {}) {

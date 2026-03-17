@@ -3,7 +3,7 @@
   "theme": "oxide",
   "entryPoints": ["src/index.ts"],
   "out": "./docs/api",
-  "readme": "none",
+  "readme": "./README.md",
   "excludePrivate": true,
   "excludeInternal": true
 }
