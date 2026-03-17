@@ -46,6 +46,7 @@ export interface MockServerOptions {
  * await server.stop();
  * ```
  */
+
 type RuleAPI = Pick<
   RuleBuilder,
   "when" | "whenTool" | "whenToolResult" | "nextError"
@@ -143,6 +144,11 @@ export class MockServer implements RuleAPI {
     const addr = this.app.server.address();
     const port = addr !== null && typeof addr === "object" ? addr.port : 0;
     return `http://${this.host}:${port}`;
+  }
+
+  /** The API routes registered on this server, e.g. `["/v1/chat/completions", ...]`. */
+  get routes(): readonly string[] {
+    return formats.map((f) => f.route);
   }
 
   get ruleCount(): number {

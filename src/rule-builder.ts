@@ -31,7 +31,7 @@ export class RuleBuilder {
         return makeHandle(engine, engine.add(match, response, options));
       },
       replySequence(entries: readonly SequenceEntry[]): RuleHandle {
-        const steps = normalizeSequenceEntries(entries);
+        const steps = normaliseSequenceEntries(entries);
         const rule = engine.add(match, "");
         const { resolver, entryCount } = createSequenceResolver(steps, rule);
         rule.resolve = resolver;
@@ -57,7 +57,7 @@ export class RuleBuilder {
   }
 }
 
-export function normalizeSequenceEntries(
+export function normaliseSequenceEntries(
   entries: readonly SequenceEntry[],
 ): { reply: Reply; options?: ReplyOptions | undefined }[] {
   return entries.map((entry) =>

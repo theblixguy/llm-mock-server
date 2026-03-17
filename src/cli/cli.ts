@@ -78,7 +78,7 @@ async function start(options: StartOptions): Promise<void> {
       );
     }
     console.log(
-      `  ${pc.dim("Endpoints")}  ${pc.green("/v1/chat/completions")}, ${pc.green("/v1/messages")}, ${pc.green("/v1/responses")}`,
+      `  ${pc.dim("Endpoints")}  ${server.routes.map((r) => pc.green(r)).join(", ")}`,
     );
     console.log();
   }

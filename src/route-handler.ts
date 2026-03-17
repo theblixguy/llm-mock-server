@@ -11,7 +11,7 @@ import { writeSSE } from "./sse-writer.js";
 
 const HTTP_BAD_REQUEST = 400;
 
-function normalizeReply(reply: Reply): ReplyObject {
+function normaliseReply(reply: Reply): ReplyObject {
   if (typeof reply === "string") return { text: reply };
   return reply;
 }
@@ -26,7 +26,7 @@ async function resolveReply(
     logger.warn(
       `No matching rule for "${mockReq.lastMessage}", using fallback`,
     );
-    return { reply: normalizeReply(fallback), ruleDesc: undefined };
+    return { reply: normaliseReply(fallback), ruleDesc: undefined };
   }
 
   try {
@@ -35,10 +35,10 @@ async function resolveReply(
         ? await matched.resolve(mockReq)
         : matched.resolve;
     logger.debug(`Matched rule ${matched.description}`);
-    return { reply: normalizeReply(raw), ruleDesc: matched.description };
+    return { reply: normaliseReply(raw), ruleDesc: matched.description };
   } catch (err) {
     logger.error(`Resolver threw for rule ${matched.description}`, err);
-    return { reply: normalizeReply(fallback), ruleDesc: matched.description };
+    return { reply: normaliseReply(fallback), ruleDesc: matched.description };
   }
 }
 
