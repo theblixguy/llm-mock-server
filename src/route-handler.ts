@@ -1,12 +1,8 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { ZodError } from "zod";
-import type {
-  Reply,
-  ReplyObject,
-  ReplyOptions,
-  MockRequest,
-  Rule,
-} from "./types.js";
+import type { MockRequest } from "./types/request.js";
+import type { Reply, ReplyObject, ReplyOptions } from "./types/reply.js";
+import type { Rule } from "./types/rule.js";
 import type { Format } from "./formats/types.js";
 import type { RuleEngine } from "./rule-engine.js";
 import type { RequestHistory } from "./history.js";

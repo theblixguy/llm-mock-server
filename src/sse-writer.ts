@@ -1,6 +1,6 @@
 import type { FastifyReply } from "fastify";
 import type { SSEChunk } from "./formats/types.js";
-import type { ReplyOptions } from "./types.js";
+import type { ReplyOptions } from "./types/reply.js";
 
 const HTTP_OK = 200;
 

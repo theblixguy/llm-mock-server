@@ -1,4 +1,4 @@
-import type { MockRequest } from "./types.js";
+import type { MockRequest } from "./types/request.js";
 
 /** A recorded request with the rule that matched and when it happened. */
 export interface RecordedRequest {

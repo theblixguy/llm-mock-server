@@ -2,7 +2,8 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { join, extname } from "node:path";
 import JSON5 from "json5";
 import { z } from "zod";
-import type { Handler, Match, MatchObject, Reply } from "./types.js";
+import type { Reply } from "./types/reply.js";
+import type { Handler, Match, MatchObject } from "./types/rule.js";
 import { type RuleEngine, createSequenceResolver } from "./rule-engine.js";
 
 interface LoadContext {
