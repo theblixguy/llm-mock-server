@@ -1,7 +1,6 @@
-import type { ReplyObject } from "../types.js";
+import type { ReplyObject } from "../types/reply.js";
 
 export const MS_PER_SECOND = 1000;
-const BASE_36 = 36;
 export const DEFAULT_USAGE = { input: 10, output: 5 } as const;
 
 export function splitText(text: string, chunkSize: number): string[] {
@@ -13,8 +12,12 @@ export function splitText(text: string, chunkSize: number): string[] {
   return chunks;
 }
 
+function randomSuffix(): string {
+  return crypto.randomUUID().replaceAll("-", "").slice(0, 12);
+}
+
 export function genId(prefix: string): string {
-  return `${prefix}_${Date.now().toString(BASE_36)}`;
+  return `${prefix}_${randomSuffix()}`;
 }
 
 export function toolId(
@@ -22,7 +25,7 @@ export function toolId(
   prefix: string,
   index: number,
 ): string {
-  return tool.id ?? `${prefix}_${Date.now().toString(BASE_36)}_${index}`;
+  return tool.id ?? `${prefix}_${randomSuffix()}_${index}`;
 }
 
 export function shouldEmitText(reply: ReplyObject): boolean {

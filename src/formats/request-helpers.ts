@@ -1,4 +1,9 @@
-import type { FormatName, Message, MockRequest, ToolDef } from "../types.js";
+import type {
+  FormatName,
+  Message,
+  MockRequest,
+  ToolDef,
+} from "../types/request.js";
 
 function asRecord(body: unknown): Record<string, unknown> {
   if (typeof body === "object" && body !== null)

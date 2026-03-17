@@ -26,9 +26,9 @@ flowchart LR
 
 ## Startup
 
-[`cli.ts`](src/cli.ts) is the CLI entry point. It parses flags with Commander, validates them through [`cli-validators.ts`](src/cli-validators.ts), creates a `MockServer`, loads any rule files, and handles SIGINT/SIGTERM. With `--watch`, it sets up `fs.watch()` on the rules path and reloads on changes.
+[`cli.ts`](src/cli/cli.ts) is the CLI entry point. It parses flags with Commander, validates them through [`validators.ts`](src/cli/validators.ts), creates a `MockServer`, loads any rule files, and handles SIGINT/SIGTERM. With `--watch`, it sets up `fs.watch()` on the rules path and reloads on changes.
 
-[`MockServer`](src/mock-server.ts) is the main class. The constructor creates a Fastify instance and registers a route handler for each format. Consumers interact with it through `when()`, `fallback()`, `load()`, and the lifecycle methods.
+[`MockServer`](src/mock-server.ts) is the main class. The constructor creates a Fastify instance and registers a route handler for each format. Rule authoring (`when()`, `whenTool()`, `whenToolResult()`, `nextError()`) lives in [`RuleBuilder`](src/rule-builder.ts) and is proxied onto `MockServer` via `.bind()`. Consumers interact with it through the rule methods, `fallback()`, `load()`, and the lifecycle methods.
 
 [`createMock()`](src/index.ts) is a convenience that creates a server and starts it in one call.
 
@@ -50,7 +50,7 @@ Each format directory has three files:
 - `serialize.ts` takes a [`ReplyObject`](src/types/reply.ts) and produces SSE chunks or a JSON response
 - `index.ts` wires parse and serialize together into a `Format` object
 
-Shared helpers live in [`parse-helpers.ts`](src/formats/parse-helpers.ts). Functions like `buildMockRequest()`, `genId()`, `splitText()`, `shouldEmitText()`, and `finishReason()` are used by all three formats. `isStreaming()` is also shared because every format checks `body.stream !== false` the same way.
+Shared helpers are split into request and response files: [`request-helpers.ts`](src/formats/request-helpers.ts) has `buildMockRequest()` and `isStreaming()` (used by parsers), and [`serialize-helpers.ts`](src/formats/serialize-helpers.ts) has `genId()`, `splitText()`, `shouldEmitText()`, and `finishReason()` (used by serialisers).
 
 To add a new format (say, Gemini), you would create a new directory with those three files and add it to the `formats` array in `mock-server.ts`. Everything else (rule matching, streaming, logging, history) works automatically.
 
@@ -91,7 +91,7 @@ Types are split across three files in [`src/types/`](src/types/):
 - [`reply.ts`](src/types/reply.ts) has `Reply`, `ReplyObject`, `ErrorReply`, `ToolCall`, `Resolver`, and `ReplyOptions`
 - [`rule.ts`](src/types/rule.ts) has `Match`, `MatchObject`, `PendingRule`, `RuleHandle`, `RuleSummary`, `Handler`, and `Rule`
 
-[`src/types.ts`](src/types.ts) re-exports everything from the barrel so internal files can import from a single place.
+[`src/types.ts`](src/types.ts) re-exports everything as a barrel for the public API. Internal modules import directly from the leaf files.
 
 ## Streaming
 
@@ -122,4 +122,4 @@ JSON5 files go through Zod validation and never execute code. The only dynamic c
 
 Fastify caps request bodies at 1 MB by default. The server binds to `127.0.0.1` unless explicitly configured otherwise. Responses are serialised through JSON, so reply text cannot break out of SSE framing.
 
-CLI inputs (port, host, latency, log level) are validated through [`cli-validators.ts`](src/cli-validators.ts) before use.
+CLI inputs (port, host, latency, log level) are validated through [`validators.ts`](src/cli/validators.ts) before use.

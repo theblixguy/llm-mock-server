@@ -1,4 +1,4 @@
-import type { ReplyObject, ReplyOptions, ToolCall } from "../../types.js";
+import type { ReplyObject, ReplyOptions, ToolCall } from "../../types/reply.js";
 import type { SSEChunk } from "../types.js";
 import {
   splitText,

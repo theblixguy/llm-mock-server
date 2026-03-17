@@ -1,13 +1,6 @@
-import type {
-  Match,
-  MatchObject,
-  MockRequest,
-  Resolver,
-  Reply,
-  ReplyOptions,
-  Rule,
-  RuleSummary,
-} from "./types.js";
+import type { MockRequest } from "./types/request.js";
+import type { Reply, ReplyOptions, Resolver } from "./types/reply.js";
+import type { Match, MatchObject, Rule, RuleSummary } from "./types/rule.js";
 
 function safeRegex(re: RegExp): RegExp {
   return re.global || re.sticky

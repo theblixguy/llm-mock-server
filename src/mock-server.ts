@@ -1,17 +1,9 @@
 import Fastify from "fastify";
 import type { FastifyInstance } from "fastify";
-import type {
-  Match,
-  PendingRule,
-  Reply,
-  ReplyOptions,
-  Resolver,
-  Rule,
-  RuleHandle,
-  RuleSummary,
-  SequenceEntry,
-} from "./types.js";
-import { RuleEngine, createSequenceResolver } from "./rule-engine.js";
+import type { Reply, ReplyOptions } from "./types/reply.js";
+import type { RuleSummary } from "./types/rule.js";
+import { RuleEngine } from "./rule-engine.js";
+import { RuleBuilder } from "./rule-builder.js";
 import { RequestHistory } from "./history.js";
 import { openaiFormat } from "./formats/openai/index.js";
 import { anthropicFormat } from "./formats/anthropic/index.js";
@@ -54,15 +46,31 @@ export interface MockServerOptions {
  * await server.stop();
  * ```
  */
-export class MockServer {
+
+type RuleAPI = Pick<
+  RuleBuilder,
+  "when" | "whenTool" | "whenToolResult" | "nextError"
+>;
+
+export class MockServer implements RuleAPI {
   private readonly app: FastifyInstance;
   private readonly engine = new RuleEngine();
+  private readonly rules_ = new RuleBuilder(this.engine);
   private readonly history_ = new RequestHistory();
   private readonly logger: Logger;
   private readonly host: string;
   private readonly defaultOptions: ReplyOptions;
   private fallbackReply: Reply = "Mock server: no matching rule.";
   private listening = false;
+
+  /** @see RuleBuilder.when */
+  when = this.rules_.when.bind(this.rules_);
+  /** @see RuleBuilder.whenTool */
+  whenTool = this.rules_.whenTool.bind(this.rules_);
+  /** @see RuleBuilder.whenToolResult */
+  whenToolResult = this.rules_.whenToolResult.bind(this.rules_);
+  /** @see RuleBuilder.nextError */
+  nextError = this.rules_.nextError.bind(this.rules_);
 
   constructor(options: MockServerOptions = {}) {
     this.host = options.host ?? "127.0.0.1";
@@ -88,92 +96,6 @@ export class MockServer {
     for (const format of formats) {
       this.app.post(format.route, createRouteHandler(format, deps));
     }
-  }
-
-  /**
-   * Register a matching rule. Call `.reply()` on the result to set the response.
-   *
-   * @example
-   * ```ts
-   * server.when("hello").reply("Hi!");
-   * server.when(/explain (\w+)/i).reply((req) => `Let me explain ${req.lastMessage}`);
-   * server.when({ model: /claude/ }).reply("I'm Claude.");
-   * ```
-   */
-  when(match: Match): PendingRule {
-    const engine = this.engine;
-
-    const makeHandle = (rule: Rule): RuleHandle => ({
-      times(n: number): RuleHandle {
-        rule.remaining = n;
-        return this;
-      },
-      first(): RuleHandle {
-        engine.moveToFront(rule);
-        return this;
-      },
-    });
-
-    return {
-      reply(response: Resolver, options?: ReplyOptions): RuleHandle {
-        return makeHandle(engine.add(match, response, options));
-      },
-      replySequence(entries: readonly SequenceEntry[]): RuleHandle {
-        const steps = entries.map((entry) =>
-          typeof entry === "string" || !("reply" in entry)
-            ? { reply: entry as Reply }
-            : { reply: entry.reply, options: entry.options },
-        );
-        const rule = engine.add(match, "");
-        const { resolver, entryCount } = createSequenceResolver(steps, rule);
-        rule.resolve = resolver;
-        rule.remaining = entryCount;
-        return makeHandle(rule);
-      },
-    };
-  }
-
-  /**
-   * Register a rule that matches when the request includes a tool with this name.
-   *
-   * @example
-   * ```ts
-   * server.whenTool("get_weather").reply({
-   *   tools: [{ name: "get_weather", args: { location: "London" } }],
-   * });
-   * ```
-   */
-  whenTool(toolName: string): PendingRule {
-    return this.when({ toolName });
-  }
-
-  /**
-   * Register a rule that matches when the last message is a tool result with this call ID.
-   *
-   * @example
-   * ```ts
-   * server.whenToolResult("call_abc").reply("Got your result, cheers!");
-   * ```
-   */
-  whenToolResult(toolCallId: string): PendingRule {
-    return this.when({ toolCallId });
-  }
-
-  /**
-   * Queue a one-shot error for the very next request, regardless of content.
-   * Fires once then removes itself.
-   *
-   * @example
-   * ```ts
-   * server.nextError(429, "Rate limited");
-   * // next request gets a 429, after that normal matching resumes
-   * ```
-   */
-  nextError(status: number, message: string, type?: string): RuleHandle {
-    return this.when(() => true)
-      .reply({ error: { status, message, type } })
-      .times(1)
-      .first();
   }
 
   /** Set the reply used when no rule matches. Defaults to a generic message. */
@@ -222,6 +144,11 @@ export class MockServer {
     const addr = this.app.server.address();
     const port = addr !== null && typeof addr === "object" ? addr.port : 0;
     return `http://${this.host}:${port}`;
+  }
+
+  /** The API routes registered on this server, e.g. `["/v1/chat/completions", ...]`. */
+  get routes(): readonly string[] {
+    return formats.map((f) => f.route);
   }
 
   get ruleCount(): number {

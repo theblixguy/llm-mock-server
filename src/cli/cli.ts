@@ -4,18 +4,18 @@ import { watch } from "node:fs";
 import { createRequire } from "node:module";
 import { Command } from "commander";
 import pc from "picocolors";
-import { MockServer } from "./mock-server.js";
-import { Logger } from "./logger.js";
+import { MockServer } from "../mock-server.js";
+import { Logger } from "../logger.js";
 import {
   parsePort,
   parseHost,
   parseLogLevel,
   parseChunkSize,
   parseLatency,
-} from "./cli-validators.js";
+} from "./validators.js";
 
 const require = createRequire(import.meta.url);
-const { version } = require("../package.json") as { version: string };
+const { version } = require("../../package.json") as { version: string };
 
 const WATCH_DEBOUNCE_MS = 100;
 
@@ -78,7 +78,7 @@ async function start(options: StartOptions): Promise<void> {
       );
     }
     console.log(
-      `  ${pc.dim("Endpoints")}  ${pc.green("/v1/chat/completions")}, ${pc.green("/v1/messages")}, ${pc.green("/v1/responses")}`,
+      `  ${pc.dim("Endpoints")}  ${server.routes.map((r) => pc.green(r)).join(", ")}`,
     );
     console.log();
   }

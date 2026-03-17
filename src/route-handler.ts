@@ -1,12 +1,8 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { ZodError } from "zod";
-import type {
-  Reply,
-  ReplyObject,
-  ReplyOptions,
-  MockRequest,
-  Rule,
-} from "./types.js";
+import type { MockRequest } from "./types/request.js";
+import type { Reply, ReplyObject, ReplyOptions } from "./types/reply.js";
+import type { Rule } from "./types/rule.js";
 import type { Format } from "./formats/types.js";
 import type { RuleEngine } from "./rule-engine.js";
 import type { RequestHistory } from "./history.js";
@@ -15,7 +11,7 @@ import { writeSSE } from "./sse-writer.js";
 
 const HTTP_BAD_REQUEST = 400;
 
-function normalizeReply(reply: Reply): ReplyObject {
+function normaliseReply(reply: Reply): ReplyObject {
   if (typeof reply === "string") return { text: reply };
   return reply;
 }
@@ -30,7 +26,7 @@ async function resolveReply(
     logger.warn(
       `No matching rule for "${mockReq.lastMessage}", using fallback`,
     );
-    return { reply: normalizeReply(fallback), ruleDesc: undefined };
+    return { reply: normaliseReply(fallback), ruleDesc: undefined };
   }
 
   try {
@@ -39,10 +35,10 @@ async function resolveReply(
         ? await matched.resolve(mockReq)
         : matched.resolve;
     logger.debug(`Matched rule ${matched.description}`);
-    return { reply: normalizeReply(raw), ruleDesc: matched.description };
+    return { reply: normaliseReply(raw), ruleDesc: matched.description };
   } catch (err) {
     logger.error(`Resolver threw for rule ${matched.description}`, err);
-    return { reply: normalizeReply(fallback), ruleDesc: matched.description };
+    return { reply: normaliseReply(fallback), ruleDesc: matched.description };
   }
 }
 
