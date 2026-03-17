@@ -391,7 +391,6 @@ llm-mock-server [options]
 | `--port` | `-p` | `5555` | Port to listen on |
 | `--host` | `-H` | `127.0.0.1` | Host to bind to |
 | `--rules` | `-r` | | Path to rules file or directory |
-| `--handler` | | | Path to handler file |
 | `--latency` | `-l` | `0` | Ms between SSE chunks |
 | `--chunk-size` | `-c` | `0` | Characters per SSE chunk |
 | `--fallback` | `-f` | | Fallback reply text |
@@ -411,7 +410,7 @@ This is a testing tool, not a production service. It's designed to run locally o
 
 ### Handler files execute code
 
-When you call `server.load()` or pass `--handler` on the CLI, `.ts`/`.js` files are loaded via dynamic `import()`. They run with the same permissions as the rest of your Node.js process. Only load files you trust.
+When you call `server.load()` or pass `--rules` on the CLI, `.ts`/`.js` files are loaded via dynamic `import()`. They run with the same permissions as the rest of your Node.js process. Only load files you trust.
 
 ### JSON5 rule files are data only
 
