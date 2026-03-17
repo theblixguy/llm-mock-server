@@ -10,7 +10,10 @@ export interface MockRequest {
   readonly format: FormatName;
   /** The model string from the request, e.g. `"gpt-5.4"` or `"claude-sonnet-4-6"`. */
   readonly model: string;
-  /** Whether the client asked for SSE streaming (`stream` field, defaults to `true`). */
+  /**
+   * Whether the client asked for SSE streaming (from the `stream` field).
+   * @defaultValue `true`
+   */
   readonly streaming: boolean;
   /** Full conversation, normalised from whatever format came in. */
   readonly messages: readonly Message[];

@@ -109,7 +109,10 @@ export interface Handler {
 export interface RuleSummary {
   /** Human-readable description of what the rule matches. */
   readonly description: string;
-  /** How many matches are left. `Infinity` means unlimited. */
+  /**
+   * How many matches are left.
+   * @defaultValue `Infinity` (unlimited)
+   */
   readonly remaining: number;
 }
 

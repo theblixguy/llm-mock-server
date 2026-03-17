@@ -21,7 +21,10 @@ export interface ReplyObject {
   readonly reasoning?: string | undefined;
   /** Tool calls the model wants to make. */
   readonly tools?: readonly ToolCall[] | undefined;
-  /** Token counts to report. Falls back to `{ input: 10, output: 5 }` if omitted. */
+  /**
+   * Token counts to report.
+   * @defaultValue `{ input: 10, output: 5 }`
+   */
   readonly usage?:
     | { readonly input: number; readonly output: number }
     | undefined;
@@ -35,7 +38,10 @@ export interface ErrorReply {
   readonly status: number;
   /** Error message in the response body. */
   readonly message: string;
-  /** Error type string in the response body. Each format has its own default if omitted. */
+  /**
+   * Error type string in the response body.
+   * @defaultValue Format-specific (e.g. `"server_error"` for OpenAI, `"api_error"` for Anthropic).
+   */
   readonly type?: string | undefined;
 }
 

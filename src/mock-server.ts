@@ -21,15 +21,30 @@ const formats: readonly Format[] = [
 
 /** Options for constructing a `MockServer` or calling `createMock()`. */
 export interface MockServerOptions {
-  /** Port to listen on. Pass `0` for a random port (useful in tests). */
+  /**
+   * Port to listen on. Pass `0` for a random port (useful in tests).
+   * @defaultValue `0`
+   */
   readonly port?: number;
-  /** Defaults to `"127.0.0.1"`. Set to `"0.0.0.0"` to listen on all interfaces. */
+  /**
+   * Host to bind to. Set to `"0.0.0.0"` to listen on all interfaces.
+   * @defaultValue `"127.0.0.1"`
+   */
   readonly host?: string;
-  /** Defaults to `"none"` (silent). */
+  /**
+   * Log verbosity.
+   * @defaultValue `"none"`
+   */
   readonly logLevel?: LogLevel;
-  /** Default ms delay between SSE chunks. Individual rules can override this. */
+  /**
+   * Default ms delay between SSE chunks. Individual rules can override this.
+   * @defaultValue `0`
+   */
   readonly defaultLatency?: number;
-  /** Default characters per SSE text chunk. Individual rules can override this. */
+  /**
+   * Default characters per SSE text chunk. Individual rules can override this.
+   * @defaultValue `0`
+   */
   readonly defaultChunkSize?: number;
 }
 
@@ -99,7 +114,10 @@ export class MockServer implements RuleAPI {
     }
   }
 
-  /** Set the reply used when no rule matches. Defaults to a generic message. */
+  /**
+   * Set the reply used when no rule matches.
+   * @defaultValue `"Mock server: no matching rule."`
+   */
   fallback(reply: Reply): void {
     this.fallbackReply = reply;
   }
