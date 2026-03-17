@@ -21,9 +21,11 @@ function makeHandle(engine: RuleEngine, rule: Rule): RuleHandle {
   };
 }
 
+/** Builds matching rules against the rule engine. Proxied onto `MockServer`. */
 export class RuleBuilder {
   constructor(private readonly engine: RuleEngine) {}
 
+  /** Register a matching rule. Call `.reply()` on the result to set the response. */
   when(match: Match): PendingRule {
     const engine = this.engine;
     return {
@@ -41,14 +43,17 @@ export class RuleBuilder {
     };
   }
 
+  /** Shorthand for `when({ toolName })`. */
   whenTool(toolName: string): PendingRule {
     return this.when({ toolName });
   }
 
+  /** Shorthand for `when({ toolCallId })`. */
   whenToolResult(toolCallId: string): PendingRule {
     return this.when({ toolCallId });
   }
 
+  /** Queue a one-shot error for the very next request. Fires once then removes itself. */
   nextError(status: number, message: string, type?: string): RuleHandle {
     return this.when(() => true)
       .reply({ error: { status, message, type } })

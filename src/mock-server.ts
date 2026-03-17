@@ -19,6 +19,7 @@ const formats: readonly Format[] = [
   responsesFormat,
 ];
 
+/** Options for constructing a `MockServer` or calling `createMock()`. */
 export interface MockServerOptions {
   readonly port?: number;
   /** Defaults to `"127.0.0.1"`. Set to `"0.0.0.0"` to listen on all interfaces. */
@@ -30,6 +31,11 @@ export interface MockServerOptions {
   /** Default characters per SSE text chunk. Individual rules can override this. */
   readonly defaultChunkSize?: number;
 }
+
+type RuleAPI = Pick<
+  RuleBuilder,
+  "when" | "whenTool" | "whenToolResult" | "nextError"
+>;
 
 /**
  * Mock LLM server that handles OpenAI Chat Completions, Anthropic Messages, and OpenAI Responses API formats.
@@ -46,12 +52,6 @@ export interface MockServerOptions {
  * await server.stop();
  * ```
  */
-
-type RuleAPI = Pick<
-  RuleBuilder,
-  "when" | "whenTool" | "whenToolResult" | "nextError"
->;
-
 export class MockServer implements RuleAPI {
   private readonly app: FastifyInstance;
   private readonly engine = new RuleEngine();
@@ -151,6 +151,7 @@ export class MockServer implements RuleAPI {
     return formats.map((f) => f.route);
   }
 
+  /** Number of currently registered rules. */
   get ruleCount(): number {
     return this.engine.ruleCount;
   }
@@ -168,6 +169,7 @@ export class MockServer implements RuleAPI {
     this.logger.info(`Listening on ${this.url}`);
   }
 
+  /** Stop the server. Safe to call multiple times. */
   async stop(): Promise<void> {
     if (!this.listening) return;
     await this.app.close();
