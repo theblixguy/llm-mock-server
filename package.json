@@ -27,6 +27,7 @@
     "test:watch": "vitest",
     "check": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json && npm run fmt:check && npm run lint && npm test",
     "docs": "typedoc",
+    "docs:check": "typedoc --emit none",
     "dev": "tsx src/cli/cli.ts",
     "start": "node dist/cli/cli.js"
   },
