@@ -21,6 +21,7 @@ const formats: readonly Format[] = [
 
 /** Options for constructing a `MockServer` or calling `createMock()`. */
 export interface MockServerOptions {
+  /** Port to listen on. Pass `0` for a random port (useful in tests). */
   readonly port?: number;
   /** Defaults to `"127.0.0.1"`. Set to `"0.0.0.0"` to listen on all interfaces. */
   readonly host?: string;
@@ -177,6 +178,7 @@ export class MockServer implements RuleAPI {
     this.logger.info("Server stopped");
   }
 
+  /** Calls `stop()`. Enables `await using server = ...` for automatic cleanup. */
   async [Symbol.asyncDispose](): Promise<void> {
     await this.stop();
   }
