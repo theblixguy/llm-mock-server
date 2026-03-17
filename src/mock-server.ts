@@ -5,16 +5,16 @@ import type { RuleSummary } from "./types/rule.js";
 import { RuleEngine } from "./rule-engine.js";
 import { RuleBuilder } from "./rule-builder.js";
 import { RequestHistory } from "./history.js";
-import { openaiFormat } from "./formats/openai/index.js";
+import { chatCompletionsFormat } from "./formats/openai/chat-completions/index.js";
 import { anthropicFormat } from "./formats/anthropic/index.js";
-import { responsesFormat } from "./formats/responses/index.js";
+import { responsesFormat } from "./formats/openai/responses/index.js";
 import type { Format } from "./formats/types.js";
 import { Logger } from "./logger.js";
 import type { LogLevel } from "./logger.js";
 import { createRouteHandler } from "./route-handler.js";
 
 const formats: readonly Format[] = [
-  openaiFormat,
+  chatCompletionsFormat,
   anthropicFormat,
   responsesFormat,
 ];
@@ -32,7 +32,7 @@ export interface MockServerOptions {
 }
 
 /**
- * Mock LLM server that handles OpenAI, Anthropic, and Responses API formats.
+ * Mock LLM server that handles OpenAI Chat Completions, Anthropic Messages, and OpenAI Responses API formats.
  * Register rules with `when()`, point your SDK at `url`, and go.
  *
  * Supports `await using` for automatic cleanup.

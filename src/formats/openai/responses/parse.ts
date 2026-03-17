@@ -1,5 +1,5 @@
-import type { MockRequest, Message, ToolDef } from "../../types/request.js";
-import { buildMockRequest, type RequestMeta } from "../request-helpers.js";
+import type { MockRequest, Message, ToolDef } from "../../../types/request.js";
+import { buildMockRequest, type RequestMeta } from "../../request-helpers.js";
 import {
   ResponsesRequestSchema,
   FunctionToolSchema,

@@ -1,6 +1,6 @@
 # llm-mock-server architecture
 
-A mock LLM server built on Fastify. Clients send requests in OpenAI, Anthropic, or Responses API format. The server normalises them into a common shape, matches against registered rules, and sends back responses in the right format.
+A mock LLM server built on Fastify. Clients send requests in OpenAI Chat Completions, Anthropic Messages, or OpenAI Responses API format. The server normalises them into a common shape, matches against registered rules, and sends back responses in the right format.
 
 ```mermaid
 flowchart LR
@@ -8,7 +8,7 @@ flowchart LR
     Server["llm-mock-server<br/>(Fastify)"]
     Rules["Rule engine"]
 
-    Client <-->|"OpenAI / Anthropic / Responses"| Server
+    Client <-->|"Chat Completions / Messages / Responses"| Server
     Server <--> Rules
 ```
 
@@ -40,9 +40,9 @@ Three formats are included:
 
 | Format | Route | Directory |
 | ------ | ----- | --------- |
-| OpenAI | `POST /v1/chat/completions` | [`formats/openai/`](src/formats/openai/) |
-| Anthropic | `POST /v1/messages` | [`formats/anthropic/`](src/formats/anthropic/) |
-| OpenAI Responses | `POST /v1/responses` | [`formats/responses/`](src/formats/responses/) |
+| OpenAI Chat Completions | `POST /v1/chat/completions` | [`formats/openai/chat-completions/`](src/formats/openai/chat-completions/) |
+| Anthropic Messages | `POST /v1/messages` | [`formats/anthropic/`](src/formats/anthropic/) |
+| OpenAI Responses | `POST /v1/responses` | [`formats/openai/responses/`](src/formats/openai/responses/) |
 
 Each format directory has three files:
 

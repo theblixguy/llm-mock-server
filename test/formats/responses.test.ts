@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { responsesFormat } from "../../src/formats/responses/index.js";
+import { responsesFormat } from "../../src/formats/openai/responses/index.js";
 import type {
   ResponsesEvent,
   ResponsesComplete,
   ResponsesError,
-} from "../../src/formats/responses/schema.js";
+} from "../../src/formats/openai/responses/schema.js";
 
 function parse<T>(chunk: { data: string }): T {
   return JSON.parse(chunk.data) as T;
