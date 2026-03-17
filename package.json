@@ -26,6 +26,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json && npm run fmt:check && npm run lint && npm test",
+    "docs": "typedoc",
     "dev": "tsx src/cli/cli.ts",
     "start": "node dist/cli/cli.js"
   },
@@ -53,6 +54,8 @@
     "oxfmt": "0.40.0",
     "oxlint": "1.55.0",
     "tsx": "4.21.0",
+    "typedoc": "0.28.17",
+    "typedoc-theme-oxide": "0.2.5",
     "typescript": "5.9.3",
     "vitest": "4.1.0"
   }

@@ -1,0 +1,9 @@
+{
+  "plugin": ["typedoc-theme-oxide"],
+  "theme": "oxide",
+  "entryPoints": ["src/index.ts"],
+  "out": "./docs/api",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true
+}
