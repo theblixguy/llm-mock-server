@@ -40,8 +40,12 @@ describe("parsePort", () => {
     expect(() => parsePort("")).toThrow('Invalid port ""');
   });
 
-  it("truncates floating point to integer", () => {
-    expect(parsePort("80.5")).toBe(80);
+  it("throws on floating point", () => {
+    expect(() => parsePort("80.5")).toThrow('Invalid port "80.5"');
+  });
+
+  it("throws on numeric string with trailing chars", () => {
+    expect(() => parsePort("80abc")).toThrow('Invalid port "80abc"');
   });
 });
 
@@ -119,8 +123,12 @@ describe("parseLatency", () => {
     expect(() => parseLatency("")).toThrow('Invalid latency ""');
   });
 
-  it("truncates floating point to integer", () => {
-    expect(parseLatency("50.7")).toBe(50);
+  it("throws on floating point", () => {
+    expect(() => parseLatency("50.7")).toThrow('Invalid latency "50.7"');
+  });
+
+  it("throws on numeric string with trailing chars", () => {
+    expect(() => parseLatency("50abc")).toThrow('Invalid latency "50abc"');
   });
 });
 
