@@ -25,6 +25,7 @@ A mock LLM server for testing. It handles OpenAI `/chat/completions`, Anthropic 
 - [CLI](#cli)
 - [Security](#security)
 - [Architecture](#architecture)
+- [API reference](#api-reference)
 - [Licence](#licence)
 
 ## Quick start
@@ -427,6 +428,10 @@ Request bodies are capped at 1 MB by Fastify's default. Responses are serialised
 ## Architecture
 
 See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the codebase is structured, the request lifecycle, rule matching, and response serialisation.
+
+## API reference
+
+Full API docs are available [here](https://theblixguy.github.io/llm-mock-server/).
 
 ## Licence
 
