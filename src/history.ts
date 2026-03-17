@@ -2,9 +2,11 @@ import type { MockRequest } from "./types/request.js";
 
 /** A recorded request with the rule that matched and when it happened. */
 export interface RecordedRequest {
+  /** The normalised request that was received. */
   readonly request: MockRequest;
-  /** The rule that matched, or `undefined` if the fallback was used. */
+  /** Description of the rule that matched, or `undefined` if the fallback was used. */
   readonly rule: string | undefined;
+  /** When the request was recorded (`Date.now()` value). */
   readonly timestamp: number;
 }
 
@@ -61,6 +63,7 @@ export class RequestHistory {
     this.entries.length = 0;
   }
 
+  /** Enables `for...of` iteration over recorded entries. */
   [Symbol.iterator](): Iterator<RecordedRequest> {
     return this.entries[Symbol.iterator]();
   }
