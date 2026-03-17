@@ -12,8 +12,10 @@ export function splitText(text: string, chunkSize: number): string[] {
   return chunks;
 }
 
+const ID_SUFFIX_LENGTH = 12;
+
 function randomSuffix(): string {
-  return crypto.randomUUID().replaceAll("-", "").slice(0, 12);
+  return crypto.randomUUID().replaceAll("-", "").slice(0, ID_SUFFIX_LENGTH);
 }
 
 export function genId(prefix: string): string {

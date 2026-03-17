@@ -116,7 +116,7 @@ Directories are read and processed in sorted order.
 
 The threat model is simple: the server runs locally or in CI, loading files written by the developer. There is no multi-tenant isolation or sandboxing.
 
-Handler files (`.ts`, `.js`, `.mjs`) are loaded via `import()` and execute with full process permissions. The trust boundary is the file system path passed to `load()` or `--handler`. If an attacker can write to that path, they already have code execution on the machine. No path restriction is enforced because legitimate setups often load rules from outside the project directory.
+Handler files (`.ts`, `.js`, `.mjs`) are loaded via `import()` and execute with full process permissions. The trust boundary is the file system path passed to `load()` or `--rules`. If an attacker can write to that path, they already have code execution on the machine. No path restriction is enforced because legitimate setups often load rules from outside the project directory.
 
 JSON5 files go through Zod validation and never execute code. The only dynamic construction is `new RegExp()` for regex patterns in rule files, which could hang on pathological backtracking patterns but poses no injection risk.
 

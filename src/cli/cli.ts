@@ -23,7 +23,6 @@ interface StartOptions {
   port: string;
   host: string;
   rules?: string;
-  handler?: string;
   latency: string;
   chunkSize: string;
   fallback?: string;
@@ -53,9 +52,6 @@ async function start(options: StartOptions): Promise<void> {
 
   if (options.rules) {
     await server.load(options.rules);
-  }
-  if (options.handler) {
-    await server.load(options.handler);
   }
 
   const quiet = logLevel === "none";
@@ -131,8 +127,7 @@ program
   .description("Start the mock server")
   .option("-p, --port <number>", "port to listen on", "5555")
   .option("-H, --host <address>", "host to bind to", "127.0.0.1")
-  .option("-r, --rules <path>", "path to .json5 rules file or directory")
-  .option("--handler <path>", "path to .ts handler file")
+  .option("-r, --rules <path>", "path to rules file or directory")
   .option("-l, --latency <ms>", "latency between SSE chunks (ms)", "0")
   .option("-c, --chunk-size <chars>", "characters per SSE chunk", "0")
   .option("-f, --fallback <text>", "fallback reply text")
