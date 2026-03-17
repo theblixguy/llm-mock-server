@@ -16,7 +16,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "llm-mock-server": "./dist/cli.js"
+    "llm-mock-server": "./dist/cli/cli.js"
   },
   "scripts": {
     "build": "tsc",
@@ -26,8 +26,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json && npm run fmt:check && npm run lint && npm test",
-    "dev": "tsx src/cli.ts",
-    "start": "node dist/cli.js"
+    "dev": "tsx src/cli/cli.ts",
+    "start": "node dist/cli/cli.js"
   },
   "keywords": [
     "llm",

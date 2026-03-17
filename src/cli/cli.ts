@@ -4,18 +4,18 @@ import { watch } from "node:fs";
 import { createRequire } from "node:module";
 import { Command } from "commander";
 import pc from "picocolors";
-import { MockServer } from "./mock-server.js";
-import { Logger } from "./logger.js";
+import { MockServer } from "../mock-server.js";
+import { Logger } from "../logger.js";
 import {
   parsePort,
   parseHost,
   parseLogLevel,
   parseChunkSize,
   parseLatency,
-} from "./cli-validators.js";
+} from "./validators.js";
 
 const require = createRequire(import.meta.url);
-const { version } = require("../package.json") as { version: string };
+const { version } = require("../../package.json") as { version: string };
 
 const WATCH_DEBOUNCE_MS = 100;
 
