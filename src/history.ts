@@ -56,6 +56,7 @@ export class RequestHistory {
     return this.entries;
   }
 
+  /** Remove all recorded entries. */
   clear(): void {
     this.entries.length = 0;
   }
