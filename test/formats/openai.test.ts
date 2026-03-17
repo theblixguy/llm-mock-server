@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { openaiFormat } from "../../src/formats/openai/index.js";
+import { chatCompletionsFormat } from "../../src/formats/openai/chat-completions/index.js";
 import type {
   OpenAIChunk,
   OpenAIComplete,
   OpenAIError,
-} from "../../src/formats/openai/schema.js";
+} from "../../src/formats/openai/chat-completions/schema.js";
 
 function parse<T>(chunk: { data: string }): T {
   return JSON.parse(chunk.data) as T;
@@ -13,7 +13,7 @@ function parse<T>(chunk: { data: string }): T {
 describe("OpenAI Format", () => {
   describe("parseRequest", () => {
     it("parses a basic chat completion request", () => {
-      const req = openaiFormat.parseRequest({
+      const req = chatCompletionsFormat.parseRequest({
         model: "gpt-5.4",
         messages: [
           { role: "system", content: "You are helpful" },
@@ -30,7 +30,7 @@ describe("OpenAI Format", () => {
     });
 
     it("defaults stream to true", () => {
-      const req = openaiFormat.parseRequest({
+      const req = chatCompletionsFormat.parseRequest({
         model: "gpt-5.4",
         messages: [{ role: "user", content: "hi" }],
       });
@@ -38,7 +38,7 @@ describe("OpenAI Format", () => {
     });
 
     it("detects stream: false", () => {
-      const req = openaiFormat.parseRequest({
+      const req = chatCompletionsFormat.parseRequest({
         model: "gpt-5.4",
         messages: [{ role: "user", content: "hi" }],
         stream: false,
@@ -47,7 +47,7 @@ describe("OpenAI Format", () => {
     });
 
     it("parses tools with function wrapper", () => {
-      const req = openaiFormat.parseRequest({
+      const req = chatCompletionsFormat.parseRequest({
         model: "gpt-5.4",
         messages: [{ role: "user", content: "read file" }],
         tools: [
@@ -66,7 +66,7 @@ describe("OpenAI Format", () => {
     });
 
     it("extracts toolNames from tools array", () => {
-      const req = openaiFormat.parseRequest({
+      const req = chatCompletionsFormat.parseRequest({
         model: "gpt-5.4",
         messages: [{ role: "user", content: "hi" }],
         tools: [
@@ -78,7 +78,7 @@ describe("OpenAI Format", () => {
     });
 
     it("extracts lastToolCallId from tool messages", () => {
-      const req = openaiFormat.parseRequest({
+      const req = chatCompletionsFormat.parseRequest({
         model: "gpt-5.4",
         messages: [
           { role: "user", content: "hi" },
@@ -89,7 +89,7 @@ describe("OpenAI Format", () => {
     });
 
     it("handles non-string content (array of content parts)", () => {
-      const req = openaiFormat.parseRequest({
+      const req = chatCompletionsFormat.parseRequest({
         model: "gpt-5.4",
         messages: [
           { role: "user", content: [{ type: "text", text: "Hello" }] },
@@ -100,7 +100,7 @@ describe("OpenAI Format", () => {
 
     it("rejects requests with invalid role values", () => {
       expect(() =>
-        openaiFormat.parseRequest({
+        chatCompletionsFormat.parseRequest({
           model: "gpt-5.4",
           messages: [{ role: "banana", content: "hi" }],
         }),
@@ -109,7 +109,7 @@ describe("OpenAI Format", () => {
 
     it("rejects requests missing model", () => {
       expect(() =>
-        openaiFormat.parseRequest({
+        chatCompletionsFormat.parseRequest({
           messages: [{ role: "user", content: "hi" }],
         }),
       ).toThrow();
@@ -118,14 +118,20 @@ describe("OpenAI Format", () => {
 
   describe("serialize (streaming)", () => {
     it("starts with role delta and ends with [DONE]", () => {
-      const chunks = openaiFormat.serialize({ text: "Hello world" }, "gpt-5.4");
+      const chunks = chatCompletionsFormat.serialize(
+        { text: "Hello world" },
+        "gpt-5.4",
+      );
       const first = parse<OpenAIChunk>(chunks[0]!);
       expect(first.choices[0]!.delta).toEqual({ role: "assistant" });
       expect(chunks.at(-1)!.data).toBe("[DONE]");
     });
 
     it("content delta has correct structure", () => {
-      const chunks = openaiFormat.serialize({ text: "Hello world" }, "gpt-5.4");
+      const chunks = chatCompletionsFormat.serialize(
+        { text: "Hello world" },
+        "gpt-5.4",
+      );
       const content = parse<OpenAIChunk>(chunks[1]!);
       expect(content.object).toBe("chat.completion.chunk");
       expect(content.model).toBe("gpt-5.4");
@@ -134,13 +140,16 @@ describe("OpenAI Format", () => {
     });
 
     it("finish chunk has finish_reason: stop for text", () => {
-      const chunks = openaiFormat.serialize({ text: "Hello" }, "gpt-5.4");
+      const chunks = chatCompletionsFormat.serialize(
+        { text: "Hello" },
+        "gpt-5.4",
+      );
       const finish = parse<OpenAIChunk>(chunks.at(-3)!);
       expect(finish.choices[0]!.finish_reason).toBe("stop");
     });
 
     it("finish chunk has finish_reason: tool_calls for tools", () => {
-      const chunks = openaiFormat.serialize(
+      const chunks = chatCompletionsFormat.serialize(
         { tools: [{ name: "read_file", args: { path: "/tmp" } }] },
         "gpt-5.4",
       );
@@ -149,7 +158,7 @@ describe("OpenAI Format", () => {
     });
 
     it("includes usage chunk before [DONE]", () => {
-      const chunks = openaiFormat.serialize(
+      const chunks = chatCompletionsFormat.serialize(
         { text: "Hello", usage: { input: 10, output: 5 } },
         "gpt-5.4",
       );
@@ -166,7 +175,7 @@ describe("OpenAI Format", () => {
     });
 
     it("tool call delta has correct structure", () => {
-      const chunks = openaiFormat.serialize(
+      const chunks = chatCompletionsFormat.serialize(
         { tools: [{ name: "read_file", args: { path: "/tmp" } }] },
         "gpt-5.4",
       );
@@ -183,14 +192,14 @@ describe("OpenAI Format", () => {
     });
 
     it("no named events (openai uses data-only SSE)", () => {
-      const chunks = openaiFormat.serialize({ text: "hi" }, "gpt-5.4");
+      const chunks = chatCompletionsFormat.serialize({ text: "hi" }, "gpt-5.4");
       for (const chunk of chunks) {
         expect(chunk.event).toBeUndefined();
       }
     });
 
     it("splits text into multiple delta chunks with chunkSize", () => {
-      const chunks = openaiFormat.serialize(
+      const chunks = chatCompletionsFormat.serialize(
         { text: "Hello, world!" },
         "gpt-5.4",
         { chunkSize: 5 },
@@ -204,7 +213,10 @@ describe("OpenAI Format", () => {
     });
 
     it("all chunks share same id and created timestamp", () => {
-      const chunks = openaiFormat.serialize({ text: "Hello" }, "gpt-5.4");
+      const chunks = chatCompletionsFormat.serialize(
+        { text: "Hello" },
+        "gpt-5.4",
+      );
       const dataChunks = chunks
         .filter((c) => c.data !== "[DONE]")
         .map((c) => parse<OpenAIChunk>(c));
@@ -217,7 +229,7 @@ describe("OpenAI Format", () => {
 
   describe("serializeComplete (non-streaming)", () => {
     it("produces correct top-level structure", () => {
-      const result = openaiFormat.serializeComplete(
+      const result = chatCompletionsFormat.serializeComplete(
         { text: "Hello, world!" },
         "gpt-5.4",
       ) as OpenAIComplete;
@@ -228,7 +240,7 @@ describe("OpenAI Format", () => {
     });
 
     it("message has correct content and finish_reason", () => {
-      const result = openaiFormat.serializeComplete(
+      const result = chatCompletionsFormat.serializeComplete(
         { text: "Hello, world!" },
         "gpt-5.4",
       ) as OpenAIComplete;
@@ -238,7 +250,7 @@ describe("OpenAI Format", () => {
     });
 
     it("includes tool_calls with correct structure", () => {
-      const result = openaiFormat.serializeComplete(
+      const result = chatCompletionsFormat.serializeComplete(
         { tools: [{ name: "read_file", args: { path: "/tmp" } }] },
         "gpt-5.4",
       ) as OpenAIComplete;
@@ -250,7 +262,7 @@ describe("OpenAI Format", () => {
     });
 
     it("includes usage tokens with details", () => {
-      const result = openaiFormat.serializeComplete(
+      const result = chatCompletionsFormat.serializeComplete(
         { text: "hi", usage: { input: 20, output: 15 } },
         "gpt-5.4",
       ) as OpenAIComplete;
@@ -264,7 +276,7 @@ describe("OpenAI Format", () => {
     });
 
     it("includes service_tier and system_fingerprint", () => {
-      const result = openaiFormat.serializeComplete(
+      const result = chatCompletionsFormat.serializeComplete(
         { text: "hi" },
         "gpt-5.4",
       ) as OpenAIComplete;
@@ -273,7 +285,7 @@ describe("OpenAI Format", () => {
     });
 
     it("includes logprobs: null on choices", () => {
-      const result = openaiFormat.serializeComplete(
+      const result = chatCompletionsFormat.serializeComplete(
         { text: "hi" },
         "gpt-5.4",
       ) as OpenAIComplete;
@@ -283,7 +295,7 @@ describe("OpenAI Format", () => {
 
   describe("serializeError", () => {
     it("produces OpenAI error format", () => {
-      const result = openaiFormat.serializeError({
+      const result = chatCompletionsFormat.serializeError({
         status: 429,
         message: "Rate limited",
         type: "rate_limit_error",
@@ -294,7 +306,7 @@ describe("OpenAI Format", () => {
     });
 
     it("defaults type to server_error", () => {
-      const result = openaiFormat.serializeError({
+      const result = chatCompletionsFormat.serializeError({
         status: 500,
         message: "Internal",
       }) as OpenAIError;
