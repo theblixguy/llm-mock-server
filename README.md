@@ -1,4 +1,4 @@
-# llm-mock-server
+# llm-mock-server [![npm version](https://img.shields.io/npm/v/llm-mock-server)](https://www.npmjs.com/package/llm-mock-server) ![npm downloads](https://img.shields.io/npm/d18m/llm-mock-server)
 
 A mock LLM server for testing. It handles OpenAI `/chat/completions`, Anthropic `/messages`, and OpenAI `/responses` API formats, with both streaming (SSE) and non-streaming responses. Point any client at it and get instant, deterministic replies. Used by [xcode-copilot-server](https://github.com/theblixguy/xcode-copilot-server) and [copilot-sdk-proxy](https://github.com/theblixguy/copilot-sdk-proxy) for their integration tests.
 
