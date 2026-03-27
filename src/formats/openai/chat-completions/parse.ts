@@ -1,5 +1,8 @@
-import type { MockRequest, Message, ToolDef } from "../../../types/request.js";
-import { buildMockRequest, type RequestMeta } from "../../request-helpers.js";
+import type { MockRequest, Message, ToolDef } from "#/types/request.js";
+import {
+  buildMockRequest,
+  type RequestMeta,
+} from "#/formats/request-helpers.js";
 import { OpenAIRequestSchema, type OpenAIRequest } from "./schema.js";
 
 function extractContent(

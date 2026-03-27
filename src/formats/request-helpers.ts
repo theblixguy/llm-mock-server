@@ -3,7 +3,7 @@ import type {
   Message,
   MockRequest,
   ToolDef,
-} from "../types/request.js";
+} from "#/types/request.js";
 
 function asRecord(body: unknown): Record<string, unknown> {
   if (typeof body === "object" && body !== null)

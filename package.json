@@ -15,6 +15,9 @@
     },
     "./package.json": "./package.json"
   },
+  "imports": {
+    "#/*": "./src/*"
+  },
   "bin": {
     "llm-mock-server": "./dist/cli/cli.js"
   },

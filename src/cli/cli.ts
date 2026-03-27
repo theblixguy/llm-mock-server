@@ -4,8 +4,8 @@ import { watch } from "node:fs";
 import { createRequire } from "node:module";
 import { Command } from "commander";
 import pc from "picocolors";
-import { MockServer } from "../mock-server.js";
-import { Logger } from "../logger.js";
+import { MockServer } from "#/mock-server.js";
+import { Logger } from "#/logger.js";
 import {
   parsePort,
   parseHost,

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { RequestHistory, type RecordedRequest } from "../src/history.js";
+import { RequestHistory, type RecordedRequest } from "#/history.js";
 import { makeReq } from "./helpers/make-req.js";
 
 describe("RequestHistory", () => {

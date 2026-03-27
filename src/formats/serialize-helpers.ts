@@ -1,4 +1,4 @@
-import type { ReplyObject } from "../types/reply.js";
+import type { ReplyObject } from "#/types/reply.js";
 
 export const MS_PER_SECOND = 1000;
 export const DEFAULT_USAGE = { input: 10, output: 5 } as const;
