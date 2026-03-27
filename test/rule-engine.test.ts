@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { RuleEngine } from "../src/rule-engine.js";
+import { RuleEngine } from "#/rule-engine.js";
 import { makeReq } from "./helpers/make-req.js";
 
 describe("RuleEngine", () => {

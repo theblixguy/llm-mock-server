@@ -1,6 +1,6 @@
 import { isIP } from "node:net";
 import { lookup } from "node:dns/promises";
-import { LEVEL_PRIORITY, type LogLevel } from "../logger.js";
+import { LEVEL_PRIORITY, type LogLevel } from "#/logger.js";
 
 const VALID_LOG_LEVELS: string[] = Object.keys(LEVEL_PRIORITY);
 
