@@ -56,7 +56,7 @@
     "@types/node": "25.5.0",
     "@vitest/coverage-v8": "4.1.2",
     "oxfmt": "0.42.0",
-    "oxlint": "1.57.0",
+    "oxlint": "1.58.0",
     "tsx": "4.21.0",
     "typedoc": "0.28.18",
     "typedoc-theme-oxide": "0.2.5",
