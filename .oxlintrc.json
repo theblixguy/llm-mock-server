@@ -14,7 +14,6 @@
     "typescript/no-non-null-assertion": "off",
     "unicorn/filename-case": "off",
     "unicorn/no-null": "off",
-    "unicorn/prevent-abbreviations": "off",
     "unicorn/no-array-for-each": "off",
     "unicorn/consistent-function-scoping": "off",
     "import/no-default-export": "off",
@@ -27,7 +26,9 @@
     {
       "files": ["test/**/*.ts"],
       "rules": {
-        "no-magic-numbers": "off"
+        "no-magic-numbers": "off",
+        "vitest/require-to-throw-message": "off",
+        "vitest/expect-expect": "off"
       }
     }
   ],
