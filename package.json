@@ -16,8 +16,14 @@
     "./package.json": "./package.json"
   },
   "imports": {
-    "#/*": "./src/*"
+    "#/*": {
+      "llm-mock-server-dev": "./src/*",
+      "default": "./dist/*"
+    }
   },
+  "files": [
+    "dist"
+  ],
   "bin": {
     "llm-mock-server": "./dist/cli/cli.js"
   },
@@ -31,7 +37,7 @@
     "check": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json && npm run fmt:check && npm run lint && npm test",
     "docs": "typedoc",
     "docs:check": "typedoc --emit none",
-    "dev": "tsx src/cli/cli.ts",
+    "dev": "tsx -C llm-mock-server-dev src/cli/cli.ts",
     "start": "node dist/cli/cli.js"
   },
   "keywords": [
