@@ -3,6 +3,7 @@
     "target": "ES2025",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "customConditions": ["llm-mock-server-dev"],
     "lib": ["ES2025"],
     "outDir": "./dist",
     "rootDir": "./src",
