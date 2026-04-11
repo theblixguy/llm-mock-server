@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { createMock, MockServer } from "#/index.js";
+import { createMock, MockServer } from "#index.js";
 
 interface OpenAIResponse {
   choices: {

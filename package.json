@@ -1,6 +1,6 @@
 {
   "name": "llm-mock-server",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A standalone mock LLM server for deterministic testing: OpenAI, Anthropic, and Responses API formats",
   "type": "module",
   "engines": {
@@ -16,7 +16,7 @@
     "./package.json": "./package.json"
   },
   "imports": {
-    "#/*": {
+    "#*": {
       "llm-mock-server-dev": "./src/*",
       "default": "./dist/*"
     }
@@ -54,7 +54,7 @@
     "commander": "14.0.3",
     "fastify": "5.8.4",
     "json5": "2.2.3",
-    "llm-schemas": "1.0.3",
+    "llm-schemas": "1.0.4",
     "picocolors": "1.1.1",
     "zod": "4.3.6"
   },
