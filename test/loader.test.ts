@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { writeFile, mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
-import { RuleEngine } from "#/rule-engine.js";
-import { loadRulesFromPath } from "#/loader.js";
-import type { MockRequest } from "#/types.js";
+import { RuleEngine } from "#rule-engine.js";
+import { loadRulesFromPath } from "#loader.js";
+import type { MockRequest } from "#types.js";
 import { makeReq } from "./helpers/make-req.js";
 
 const tmpDir = join(import.meta.dirname, ".tmp-loader-test");

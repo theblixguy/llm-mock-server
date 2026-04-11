@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { Logger, LEVEL_PRIORITY } from "#/logger.js";
-import type { LogLevel } from "#/logger.js";
+import { Logger, LEVEL_PRIORITY } from "#logger.js";
+import type { LogLevel } from "#logger.js";
 
 afterEach(() => {
   vi.restoreAllMocks();

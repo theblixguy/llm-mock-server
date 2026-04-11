@@ -1,5 +1,5 @@
-import type { ReplyObject, ReplyOptions } from "#/types/reply.js";
-import type { SSEChunk } from "#/formats/types.js";
+import type { ReplyObject, ReplyOptions } from "#types/reply.js";
+import type { SSEChunk } from "#formats/types.js";
 import {
   splitText,
   genId,
@@ -7,7 +7,7 @@ import {
   shouldEmitText,
   finishReason,
   DEFAULT_USAGE,
-} from "#/formats/serialize-helpers.js";
+} from "#formats/serialize-helpers.js";
 
 function buildUsage(usage: { input: number; output: number }) {
   return { input_tokens: usage.input, output_tokens: usage.output };

@@ -1,5 +1,5 @@
-import type { FormatName, MockRequest } from "#/types/request.js";
-import type { ReplyObject, ReplyOptions } from "#/types/reply.js";
+import type { FormatName, MockRequest } from "#types/request.js";
+import type { ReplyObject, ReplyOptions } from "#types/reply.js";
 import type { RequestMeta } from "./request-helpers.js";
 
 export interface SSEChunk {
