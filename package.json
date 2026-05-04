@@ -1,6 +1,6 @@
 {
   "name": "llm-mock-server",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A standalone mock LLM server for deterministic testing: OpenAI, Anthropic, and Responses API formats",
   "type": "module",
   "engines": {
@@ -52,21 +52,21 @@
   "license": "MIT",
   "dependencies": {
     "commander": "14.0.3",
-    "fastify": "5.8.4",
+    "fastify": "5.8.5",
     "json5": "2.2.3",
-    "llm-schemas": "1.0.4",
+    "llm-schemas": "1.0.5",
     "picocolors": "1.1.1",
-    "zod": "4.3.6"
+    "zod": "4.4.2"
   },
   "devDependencies": {
-    "@types/node": "25.5.2",
-    "@vitest/coverage-v8": "4.1.4",
-    "oxfmt": "0.44.0",
-    "oxlint": "1.59.0",
+    "@types/node": "25.6.0",
+    "@vitest/coverage-v8": "4.1.5",
+    "oxfmt": "0.47.0",
+    "oxlint": "1.62.0",
     "tsx": "4.21.0",
-    "typedoc": "0.28.18",
-    "typedoc-theme-oxide": "0.2.5",
-    "typescript": "6.0.2",
-    "vitest": "4.1.4"
+    "typedoc": "0.28.19",
+    "typedoc-theme-oxide": "0.3.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.5"
   }
 }
