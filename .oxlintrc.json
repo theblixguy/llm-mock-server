@@ -7,6 +7,7 @@
   },
   "rules": {
     "no-console": "off",
+    "no-underscore-dangle": "off",
     "no-unused-vars": "off",
     "no-magic-numbers": ["warn", { "ignore": [0, 1, -1, 2, 10] }],
     "no-await-in-loop": "off",
@@ -28,7 +29,8 @@
       "rules": {
         "no-magic-numbers": "off",
         "vitest/require-to-throw-message": "off",
-        "vitest/expect-expect": "off"
+        "vitest/expect-expect": "off",
+        "jest/expect-expect": "off"
       }
     }
   ],
